@@ -90,9 +90,38 @@ header {
     padding: 15px 0;
 }
 
+/* Logo Styles */
 .logo {
     display: flex;
     align-items: center;
+    padding: 8px 0;
+    transition: var(--transition);
+}
+
+.logo svg {
+    max-width: 220px;
+    height: auto;
+    display: block;
+}
+
+.logo:hover {
+    transform: scale(1.02);
+}
+
+.logo text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+/* Add animation for the decorative element */
+@keyframes glowAccent {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.logo svg path:last-child {
+    animation: glowAccent 3s infinite;
 }
 
 .nav-menu ul {
@@ -286,6 +315,18 @@ footer {
     color: #bdc3c7;
 }
 
+.footer-section ul li a {
+    color: #bdc3c7;
+    display: block;
+    padding: 5px 0;
+    transition: var(--transition);
+}
+
+.footer-section ul li a:hover {
+    color: var(--white);
+    transform: translateX(5px);
+}
+
 .contact-info li {
     display: flex;
     align-items: center;
@@ -460,64 +501,135 @@ footer {
     margin-bottom: 15px;
 }
 
-/* Search Bar */
-.search-container {
-    max-width: 800px;
-    margin: 0 auto 40px;
-    position: relative;
+/* Product Pages Styles */
+.product-hero {
+    background-color: var(--light-color);
+    padding: 60px 0;
+    text-align: center;
 }
 
-.search-input {
-    width: 100%;
-    padding: 12px 20px;
+.product-hero h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.product-hero p {
+    color: var(--text-light);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.products-grid {
+    padding: 60px 0;
+}
+
+.products-grid h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.product-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+.product-category {
+    background: var(--white);
     border-radius: var(--border-radius);
-    border: 1px solid #ddd;
-    font-size: 1rem;
-    padding-right: 50px;
-}
-
-.search-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.search-results {
-    display: none;
-    position: absolute;
-    width: 100%;
-    background-color: var(--white);
-    border-radius: var(--border-radius);
+    padding: 30px;
     box-shadow: var(--box-shadow);
-    z-index: 100;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.search-result-item {
-    padding: 10px 20px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
     transition: var(--transition);
 }
 
-.search-result-item:hover {
-    background-color: var(--light-color);
+.product-category:hover {
+    transform: translateY(-5px);
 }
 
-.search-result-item h4 {
+.product-category h3 {
     color: var(--primary-color);
-    margin-bottom: 5px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
 }
 
-.search-result-item p {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    margin-bottom: 0;
+.product-category ul {
+    list-style: none;
+}
+
+.product-category ul li {
+    color: var(--text-color);
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 20px;
+}
+
+.product-category ul li:before {
+    content: "•";
+    color: var(--secondary-color);
+    position: absolute;
+    left: 0;
+}
+
+.quality-assurance,
+.quality-standards,
+.manufacturing-excellence,
+.sustainability {
+    background-color: var(--light-color);
+    padding: 60px 0;
+}
+
+.quality-assurance h2,
+.quality-standards h2,
+.manufacturing-excellence h2,
+.sustainability h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.quality-assurance p,
+.quality-standards p,
+.manufacturing-excellence p,
+.sustainability p {
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.quality-assurance ul,
+.quality-standards ul,
+.manufacturing-excellence ul,
+.sustainability ul {
+    list-style: none;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.quality-assurance ul li,
+.quality-standards ul li,
+.manufacturing-excellence ul li,
+.sustainability ul li {
+    color: var(--text-color);
+    margin-bottom: 15px;
+    position: relative;
+    padding-left: 25px;
+}
+
+.quality-assurance ul li:before,
+.quality-standards ul li:before,
+.manufacturing-excellence ul li:before,
+.sustainability ul li:before {
+    content: "✓";
+    color: var(--secondary-color);
+    position: absolute;
+    left: 0;
 }
 
 /* Responsive Styles */
@@ -590,6 +702,36 @@ footer {
     
     .page-header h1 {
         font-size: 2rem;
+    }
+    
+    .product-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .product-hero p {
+        font-size: 1rem;
+        padding: 0 20px;
+    }
+    
+    .products-grid {
+        padding: 40px 0;
+    }
+    
+    .product-categories {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .product-category {
+        padding: 20px;
+    }
+    
+    .quality-assurance,
+    .quality-standards,
+    .manufacturing-excellence,
+    .sustainability {
+        padding: 40px 0;
     }
 }
 
