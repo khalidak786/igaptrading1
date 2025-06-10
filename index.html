@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGap Trading - Global Commodity Trade</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Light Gray */
+            color: #1a202c; /* Dark Gray */
+        }
+        /* Custom animation for fade-in-down */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.8s ease-out forwards;
+        }
+
+        /* Custom animation for fade-in-up */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* Hide pages by default */
+        .page {
+            display: none;
+        }
+        /* Show the active page */
+        .page.active {
+            display: block;
+        }
+
+        /* Basic modal styling */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            transform: translateY(-20px);
+            animation: slideIn 0.3s forwards;
+        }
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+            }
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="font-inter antialiased min-h-screen flex flex-col">
+
+    <div id="app" class="flex-grow">
+
+        <!-- Home Page -->
+        <section id="home-page" class="page active flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-800 p-4">
+            <header class="w-full max-w-4xl text-center mb-12">
+                <div class="flex items-center justify-center">
+                    <!-- SVG Icon for Global Trade -->
+                    <div id="global-trade-svg" class="w-24 h-24 text-blue-500 mb-6 mx-auto animate-pulse"></div>
+                    <h1 class="text-5xl md:text-6xl font-extrabold text-blue-700 leading-tight">
+                        IGap Trading
+                    </h1>
+                </div>
+                <p class="mt-4 text-xl md:text-2xl text-gray-600">
+                    Your Gateway to Global Commodity Trade
+                </p>
+            </header>
+
+            <!-- Hero Banner Section -->
+            <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-3xl shadow-2xl p-8 md:p-12 mb-12 max-w-5xl w-full text-center transform transition duration-500 hover:scale-105 border-b-8 border-blue-900">
+                <h2 class="text-4xl md:text-5xl font-extrabold mb-4 animate-fade-in-down">
+                    Connecting Worlds, Delivering Value
+                </h2>
+                <p class="text-lg md:text-xl leading-relaxed opacity-90 animate-fade-in-up">
+                    With over two decades of expertise in finance, logistics, manufacturing, and trading, we ensure seamless global supply chains and sustainable solutions.
+                </p>
+                <div class="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="about-us-btn-home" class="px-8 py-3 bg-white text-blue-700 font-bold rounded-full shadow-lg hover:bg-gray-100 transform transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        About Us
+                    </button>
+                    <button id="expertise-btn-home" class="px-8 py-3 bg-blue-500 text-white font-bold rounded-full shadow-lg hover:bg-blue-600 transform transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        Our Expertise
+                    </button>
+                </div>
+            </section>
+
+            <!-- Search Bar Section -->
+            <section class="w-full max-w-xl mb-12">
+                <div class="relative">
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Search for commodities, products, or services..."
+                        class="w-full px-6 py-3 pr-12 rounded-full shadow-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                    />
+                    <button
+                        id="search-button"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-12 max-w-4xl w-full text-center border-b-4 border-blue-500 transform transition duration-500 hover:scale-105">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">
+                    What We Offer
+                </h2>
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    At IGap Trading, we specialize in facilitating the seamless and efficient trade of a wide range of global commodities. Leveraging deep market insights and a robust network, we connect buyers and sellers across continents, ensuring transparency, reliability, and competitive pricing.
+                </p>
+                <button id="explore-products-btn-home" class="mt-8 px-8 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transform transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Explore Products
+                </button>
+            </section>
+
+            <section class="bg-blue-700 text-white rounded-3xl shadow-xl p-8 md:p-12 max-w-4xl w-full text-center transform transition duration-500 hover:scale-105">
+                <h2 class="text-3xl font-bold mb-6">Our Vision</h2>
+                <p class="text-lg leading-relaxed">
+                    To be the leading platform for global commodity trade, empowering businesses with the tools and connections they need to thrive in an interconnected world.
+                </p>
+            </section>
+        </section>
+
+        <!-- About Us Page -->
+        <section id="about-page" class="page min-h-screen bg-gray-50 text-gray-800 p-4">
+            <header class="bg-blue-700 text-white p-6 rounded-b-3xl shadow-lg text-center relative mb-8">
+                <button id="back-to-home-about" class="absolute top-4 left-4 px-4 py-2 bg-blue-600 rounded-full shadow hover:bg-blue-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    &larr; Back to Home
+                </button>
+                <h1 class="text-4xl font-extrabold">About Us</h1>
+                <p class="mt-2 text-lg">Your Trusted Partner in Global Trade</p>
+            </header>
+
+            <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-3xl shadow-xl">
+                <section class="mb-8">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Our Journey</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                        IGap Trading stands at the forefront of international commodity trading, built on over two decades of robust experience in finance, logistics, manufacturing, and trading. Our journey began with a vision to bridge gaps in global supply chains, offering unparalleled efficiency and reliability to our partners worldwide.
+                    </p>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Headquartered in the vibrant economic hub of the <strong>United Arab Emirates</strong>, we have strategically expanded our global footprint with established offices in <strong>Canada, the United Kingdom, India, and Pakistan</strong>. This extensive network allows us to provide localized insights while operating with a truly global perspective.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Our Mission</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Our mission is to facilitate seamless trade by managing the complete trade cycle, from procuring raw materials to delivering finished products at the buyer's designated location. We pride ourselves on our holistic understanding of the complexities involved, offering bespoke solutions that integrate financial, logistical, trade finance, banking, technology, and operational expertise.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Our Commitment</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        We are committed to fostering long-term relationships built on trust, transparency, and mutual growth. Our team of seasoned professionals is dedicated to navigating the intricacies of global trade, ensuring just-in-time deliveries and efficient transactions at every level of the supply chain.
+                    </p>
+                </section>
+            </main>
+        </section>
+
+        <!-- Expertise Page -->
+        <section id="expertise-page" class="page min-h-screen bg-gray-50 text-gray-800 p-4">
+            <header class="bg-blue-700 text-white p-6 rounded-b-3xl shadow-lg text-center relative mb-8">
+                <button id="back-to-home-expertise" class="absolute top-4 left-4 px-4 py-2 bg-blue-600 rounded-full shadow hover:bg-blue-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    &larr; Back to Home
+                </button>
+                <h1 class="text-4xl font-extrabold">Our Expertise & Value Proposition</h1>
+                <p class="mt-2 text-lg">Decades of Experience, Unmatched Service</p>
+            </header>
+
+            <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white rounded-3xl shadow-xl">
+                <section class="mb-8">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Our Core Strengths</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg text-gray-700">
+                        <div class="p-4 bg-blue-50 rounded-lg shadow-md border-l-4 border-blue-400">
+                            <h3 class="font-semibold text-xl text-blue-800 mb-2">Financial Acumen</h3>
+                            <p>Over 20 years in finance, including trade finance and banking. We navigate complex financial landscapes to secure optimal deals and manage risk effectively.</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg shadow-md border-l-4 border-blue-400">
+                            <h3 class="font-semibold text-xl text-blue-800 mb-2">Logistics Mastery</h3>
+                            <p>Expertise in global logistics ensures efficient, just-in-time deliveries from raw material procurement to final destination, minimizing delays and costs.</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg shadow-md border-l-4 border-blue-400">
+                            <h3 class="font-semibold text-xl text-blue-800 mb-2">Manufacturing Insights</h3>
+                            <p>Deep understanding of manufacturing processes, enabling us to source raw materials and intermediary goods that precisely meet industrial specifications.</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg shadow-md border-l-4 border-blue-400">
+                            <h3 class="font-semibold text-xl text-blue-800 mb-2">Strategic Trading</h3>
+                            <p>Leveraging market intelligence and extensive networks for strategic trading across various commodities and finished products, maximizing value for all parties.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Our Unique Value Proposition</h2>
+                    <ul class="list-disc list-inside text-lg text-gray-700 space-y-3">
+                        <li>
+                            <strong class="text-blue-800">End-to-End Trade Cycle Management:</strong> We handle every step, from sourcing to delivering goods and even facilitating sales proceeds collection.
+                        </li>
+                        <li>
+                            <strong class="text-blue-800">Holistic Understanding:</strong> Our team possesses a comprehensive grasp of financial, logistical, trade finance, banking, technology, and operational aspects of global trade.
+                        </li>
+                        <li>
+                            <strong class="text-blue-800">Global Reach, Local Presence:</strong> With offices in the UAE, Canada, UK, India, and Pakistan, we offer global capabilities with localized support and market knowledge.
+                        </li>
+                        <li>
+                            <strong class="text-blue-800">Just-In-Time Deliveries:</strong> Our logistical prowess ensures your materials and products arrive precisely when needed, optimizing your operations.
+                        </li>
+                        <li>
+                            <strong class="text-blue-800">Risk Mitigation:</strong> Our financial and operational expertise helps mitigate risks associated with international trade, providing you with peace of mind.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">Why Partner with IGap Trading?</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Choosing IGap Trading means partnering with a company that offers not just products, but a complete solution backed by deep industry knowledge and an unwavering commitment to client success. We are equipped to handle diverse needs across the commodity spectrum, ensuring efficient, transparent, and profitable transactions.
+                    </p>
+                </section>
+            </main>
+        </section>
+
+        <!-- Products Page -->
+        <section id="products-page" class="page min-h-screen bg-gray-50 text-gray-800 p-4">
+            <header class="bg-blue-700 text-white p-6 rounded-b-3xl shadow-lg text-center relative mb-8">
+                <button id="back-to-home-products" class="absolute top-4 left-4 px-4 py-2 bg-blue-600 rounded-full shadow hover:bg-blue-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    &larr; Back to Home
+                </button>
+                <h1 class="text-4xl font-extrabold">Our Products</h1>
+                <p class="mt-2 text-lg">Diverse Commodities for Global Markets</p>
+            </header>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Category Navigation will be dynamically populated -->
+                <nav id="category-navigation" class="flex flex-wrap justify-center gap-4 mb-8"></nav>
+
+                <!-- Product Listing will be dynamically populated -->
+                <div id="product-listing" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Products will be injected here by JavaScript -->
+                </div>
+
+                <!-- No products found message -->
+                <p id="no-products-message" class="text-center text-xl text-gray-600 mt-8 hidden">
+                    No products found for your search. Please try a different search.
+                </p>
+            </div>
+        </section>
+
+        <!-- Universal Footer -->
+        <footer class="mt-auto text-center text-gray-500 text-sm w-full max-w-4xl mx-auto py-8 px-4">
+            <p>&copy; <span id="current-year"></span> IGap Trading. All rights reserved.</p>
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-4">
+                <a href="mailto:contact@igaptrading.com" class="hover:underline text-blue-600 font-semibold">contact@igaptrading.com</a>
+                <div class="flex items-center space-x-2">
+                    <a href="https://wa.me/971564166810" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 font-semibold">
+                        +971 564166810
+                    </a>
+                    <a href="https://wa.me/971564166810" target="_blank" rel="noopener noreferrer">
+                        <!-- WhatsApp SVG Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" class="w-6 h-6 text-green-500">
+                            <path d="M380.9 97.1C339.4 55.4 283.8 32 224 32c-122.9 0-224 101.3-224 227.1 0 39.5 10.3 77.1 29.8 110.1L6 489.1c-1.3 4.4 2.8 8.6 7.2 7.2L85.1 445c32.9 19.5 70.5 29.8 110.1 29.8c122.9 0 224-101.3 224-227.1-.1-59.8-23.5-115.4-64.8-156.9zM224 432c-35.3 0-69.3-9.5-98.7-27.5l-4.7-2.8-51.5 13.5 14.4-49.1-3-4.7c-18-29.3-27.5-63.3-27.5-98.7 0-96.1 79.5-174.4 177.1-174.4 46.1 0 89.9 18.2 122.8 51.2 32.9 32.9 51.2 76.7 51.2 122.8 0 96.1-79.5 174.4-177.1 174.4zm105.1-120.3c-2.3-1.1-13.4-6.6-15.5-7.4s-3.5-1.1-5-1.1c-1.5 0-2.3 1.1-3.5 2.3s-4.4 5.4-5.4 6.6-2.1 1.1-4 0-16.1-5.9-20.5-16.9-4.4-10.9-3.5-12s1.1-2.1 2.3-3.5c1.1-1.1 2.3-2.8 3.5-4s1.6-2.1.8-3.5c-.8-1.1-5.4-13-7.4-17.7-1.9-4.4-3.8-3.5-5-3.5h-4.7c-1.1 0-3.5.5-5.4 2.8s-7.4 7.4-7.4 18-7.2 20.9 7.4 34.6c14.6 13.6 28.1 13 32.5 10.9s13.4-5.4 15.5-11.8 2.3-11.8 1.6-13z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="flex justify-center space-x-4 mt-2">
+                <a href="#privacy" class="hover:underline">Privacy Policy</a>
+                <a href="#terms" class="hover:underline">Terms of Service</a>
+            </div>
+        </footer>
+
+        <!-- Custom Message Modal -->
+        <div id="message-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <p id="modal-message" class="text-lg text-gray-700"></p>
+                <button id="modal-ok-button" class="mt-4 px-6 py-2 bg-blue-500 text-white font-medium rounded-full hover:bg-blue-600 transition duration-300">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Link to JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
