@@ -279,6 +279,19 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
+                        <label for="commoditiesTraded" class="block text-gray-700 text-sm font-bold mb-2">Types of Commodities Traded:</label>
+                        <input type="text" id="commoditiesTraded" placeholder="e.g., Crude Oil, Gold, Wheat (comma-separated)"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="tonnageTraded" class="block text-gray-700 text-sm font-bold mb-2">Tonnage of Commodity Traded (Last 3 Years, in Metric Tons):</label>
+                        <input type="number" id="tonnageTraded" placeholder="e.g., 100000" min="0"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
                         <label for="annualTurnover" class="block text-gray-700 text-sm font-bold mb-2">Estimated Annual Turnover (USD):</label>
                         <input type="number" id="annualTurnover" placeholder="e.g., 5000000" min="0" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
@@ -287,6 +300,50 @@
                         <label for="countriesOfOperation" class="block text-gray-700 text-sm font-bold mb-2">Primary Countries of Operation:</label>
                         <input type="text" id="countriesOfOperation" placeholder="e.g., UAE, India, Singapore (comma-separated)" required
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Compliance Details</h3>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Do you or your company deal with any sanctioned entity, country, individual, vessel, or any related party which is sanctioned by any international or national authority?
+                    </label>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <input type="radio" id="sanctionedYes" name="sanctionedDealing" value="Yes" required
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label for="sanctionedYes" class="text-gray-700">Yes</label>
+
+                        <input type="radio" id="sanctionedNo" name="sanctionedDealing" value="No" required
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label for="sanctionedNo" class="text-gray-700">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                        Is your entity part of a group?
+                    </label>
+                    <div class="flex items-center space-x-4 mt-2">
+                        <input type="radio" id="groupYes" name="isGroup" value="Yes" required
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label for="groupYes" class="text-gray-700">Yes</label>
+
+                        <input type="radio" id="groupNo" name="isGroup" value="No" required
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                        <label for="groupNo" class="text-gray-700">No</label>
+                    </div>
+                </div>
+
+                <div id="groupDetails" class="hidden">
+                    <div class="mb-4">
+                        <label for="groupName" class="block text-gray-700 text-sm font-bold mb-2">Group Name:</label>
+                        <input type="text" id="groupName" placeholder="Enter group name"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div class="mb-4">
+                        <label for="otherRelatedEntities" class="block text-gray-700 text-sm font-bold mb-2">Other Related Entities (if any, comma-separated):</label>
+                        <textarea id="otherRelatedEntities" placeholder="e.g., Subsidiary A, Parent Company B" rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
                     </div>
                 </div>
 
@@ -333,6 +390,28 @@
                 <div class="mb-6">
                     <label for="swiftBic" class="block text-gray-700 text-sm font-bold mb-2">SWIFT/BIC Code:</label>
                     <input type="text" id="swiftBic" placeholder="Enter SWIFT/BIC code" autocomplete="off"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Supporting Documents</h3>
+                <div class="mb-4">
+                    <label for="regCertificateFile" class="block text-gray-700 text-sm font-bold mb-2">Company Registration Certificate (PDF):</label>
+                    <input type="file" id="regCertificateFile" accept=".pdf"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <div class="mb-4">
+                    <label for="taxIdFile" class="block text-gray-700 text-sm font-bold mb-2">Tax Identification Document (PDF):</label>
+                    <input type="file" id="taxIdFile" accept=".pdf"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <div class="mb-4">
+                    <label for="bankStatementFile" class="block text-gray-700 text-sm font-bold mb-2">Recent Bank Statement (PDF):</label>
+                    <input type="file" id="bankStatementFile" accept=".pdf"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <div class="mb-6">
+                    <label for="otherDocsFile" class="block text-gray-700 text-sm font-bold mb-2">Other Supporting Documents (PDF, multiple allowed):</label>
+                    <input type="file" id="otherDocsFile" accept=".pdf" multiple
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                 </div>
 
@@ -394,6 +473,19 @@
         const userIdDisplay = document.getElementById('userIdDisplay');
         const logoutBtn = document.getElementById('logoutBtn');
 
+        const groupYesRadio = document.getElementById('groupYes');
+        const groupNoRadio = document.getElementById('groupNo');
+        const groupDetailsDiv = document.getElementById('groupDetails');
+        const groupNameInput = document.getElementById('groupName');
+        const otherRelatedEntitiesTextarea = document.getElementById('otherRelatedEntities');
+
+        // File inputs
+        const regCertificateFile = document.getElementById('regCertificateFile');
+        const taxIdFile = document.getElementById('taxIdFile');
+        const bankStatementFile = document.getElementById('bankStatementFile');
+        const otherDocsFile = document.getElementById('otherDocsFile');
+
+
         let currentUserId = null;
 
         // Function to show loading overlay
@@ -447,9 +539,6 @@
                     await signInWithCustomToken(auth, initialAuthToken);
                     console.log("Signed in with custom token.");
                 } else {
-                    // With explicit firebaseConfig, we should not sign in anonymously if email/password is intended
-                    // However, for Canvas environment, if no custom token, anonymous sign-in is the fallback.
-                    // If you intend *only* email/password, you might remove this signInAnonymously call.
                     await signInAnonymously(auth);
                     console.log("Signed in anonymously.");
                 }
@@ -504,11 +593,59 @@
             showSection(kycFormSection);
         });
 
+        // Event listeners for group affiliation radios
+        groupYesRadio.addEventListener('change', () => {
+            if (groupYesRadio.checked) {
+                groupDetailsDiv.classList.remove('hidden');
+                groupNameInput.setAttribute('required', 'true');
+                otherRelatedEntitiesTextarea.setAttribute('required', 'true');
+            }
+        });
+
+        groupNoRadio.addEventListener('change', () => {
+            if (groupNoRadio.checked) {
+                groupDetailsDiv.classList.add('hidden');
+                groupNameInput.removeAttribute('required');
+                otherRelatedEntitiesTextarea.removeAttribute('required');
+                groupNameInput.value = ''; // Clear values when hidden
+                otherRelatedEntitiesTextarea.value = ''; // Clear values when hidden
+            }
+        });
+
         // KYC Form Submission (Client-side only, no data persistence implemented as per request)
         kycForm.addEventListener('submit', (e) => {
             e.preventDefault();
             kycSuccess.classList.add('hidden');
             kycError.classList.add('hidden');
+
+            // Get selected radio button value for sanctioned dealing
+            const sanctionedDealingRadios = document.getElementsByName('sanctionedDealing');
+            let sanctionedDealingValue = '';
+            for (const radio of sanctionedDealingRadios) {
+                if (radio.checked) {
+                    sanctionedDealingValue = radio.value;
+                    break;
+                }
+            }
+
+            // Get selected radio button value for group affiliation
+            const isGroupRadios = document.getElementsByName('isGroup');
+            let isGroupValue = '';
+            for (const radio of isGroupRadios) {
+                if (radio.checked) {
+                    isGroupValue = radio.value;
+                    break;
+                }
+            }
+
+            // Collect file names (simulated upload)
+            const uploadedFiles = {
+                regCertificate: regCertificateFile.files.length > 0 ? regCertificateFile.files[0].name : '',
+                taxId: taxIdFile.files.length > 0 ? taxIdFile.files[0].name : '',
+                bankStatement: bankStatementFile.files.length > 0 ? bankStatementFile.files[0].name : '',
+                otherDocs: Array.from(otherDocsFile.files).map(file => file.name) // Array of names
+            };
+
 
             // Collect form data
             const formData = {
@@ -521,8 +658,14 @@
                 companyAddress: document.getElementById('companyAddress').value,
                 websiteUrl: document.getElementById('websiteUrl').value,
                 businessDescription: document.getElementById('businessDescription').value,
+                commoditiesTraded: document.getElementById('commoditiesTraded').value,
+                tonnageTraded: document.getElementById('tonnageTraded').value,
                 annualTurnover: document.getElementById('annualTurnover').value,
                 countriesOfOperation: document.getElementById('countriesOfOperation').value,
+                sanctionedDealing: sanctionedDealingValue,
+                isGroup: isGroupValue,
+                groupName: isGroupValue === 'Yes' ? groupNameInput.value : '',
+                otherRelatedEntities: isGroupValue === 'Yes' ? otherRelatedEntitiesTextarea.value : '',
                 contactPerson: document.getElementById('contactPerson').value,
                 contactPersonPosition: document.getElementById('contactPersonPosition').value,
                 contactEmail: document.getElementById('contactEmail').value,
@@ -530,17 +673,32 @@
                 bankName: document.getElementById('bankName').value,
                 bankAccountNumber: document.getElementById('bankAccountNumber').value,
                 swiftBic: document.getElementById('swiftBic').value,
-                dataAccuracyConsent: document.getElementById('dataAccuracyConsent').checked
+                dataAccuracyConsent: document.getElementById('dataAccuracyConsent').checked,
+                uploadedFiles: uploadedFiles // Include uploaded file names
             };
 
             // Basic validation
-            // Check for required fields (excluding optional ones like websiteUrl, taxIdNumber, bank details if not required)
             const requiredFields = [
                 'companyName', 'legalEntityType', 'regNumber', 'dateOfIncorporation',
                 'placeOfIncorporation', 'companyAddress', 'businessDescription',
-                'annualTurnover', 'countriesOfOperation', 'contactPerson',
-                'contactPersonPosition', 'contactEmail', 'dataAccuracyConsent'
+                'annualTurnover', 'countriesOfOperation', 'sanctionedDealing',
+                'isGroup',
+                'contactPerson', 'contactPersonPosition', 'contactEmail', 'dataAccuracyConsent'
             ];
+
+            // Add conditional validation for group details
+            if (formData.isGroup === 'Yes') {
+                if (formData.groupName.trim() === '') {
+                    kycError.textContent = "Please enter the Group Name.";
+                    kycError.classList.remove('hidden');
+                    return;
+                }
+                if (formData.otherRelatedEntities.trim() === '') {
+                    kycError.textContent = "Please enter Other Related Entities or 'None' if not applicable.";
+                    kycError.classList.remove('hidden');
+                    return;
+                }
+            }
 
             for (const field of requiredFields) {
                 if (!formData[field] || (typeof formData[field] === 'string' && formData[field].trim() === '')) {
@@ -562,6 +720,17 @@
             kycSuccess.classList.remove('hidden');
             kycForm.reset(); // Clear the form
             document.getElementById('dataAccuracyConsent').checked = false; // Manually reset checkbox
+            document.getElementsByName('sanctionedDealing').forEach(radio => radio.checked = false); // Reset radio buttons
+            document.getElementsByName('isGroup').forEach(radio => radio.checked = false); // Reset group radio buttons
+            groupDetailsDiv.classList.add('hidden'); // Hide group details
+            groupNameInput.removeAttribute('required');
+            otherRelatedEntitiesTextarea.removeAttribute('required');
+
+            // Clear file inputs
+            regCertificateFile.value = '';
+            taxIdFile.value = '';
+            bankStatementFile.value = '';
+            otherDocsFile.value = '';
         });
 
         // Logout functionality
@@ -581,4 +750,5 @@
     </script>
 </body>
 </html>
+
 
