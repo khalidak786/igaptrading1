@@ -117,6 +117,41 @@
         .legal-text-container li {
             margin-bottom: 0.5rem;
         }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Higher than loading overlay */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -517,11 +552,25 @@
         </div>
     </div>
 
+    <!-- Success Modal Structure -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Submission Successful!</h3>
+            <p id="modalMessage" class="text-gray-700 mb-6">Thank you for submitting KYC details, we will review the details and contact you.</p>
+            <button id="modalOkBtn"
+                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-md">
+                OK
+            </button>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -541,6 +590,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Initialize Firebase Storage
+
 
         // DOM Elements
         const loginSection = document.getElementById('loginSection');
@@ -550,7 +601,7 @@
         const acceptTermsBtn = document.getElementById('acceptTermsBtn');
         const kycForm = document.getElementById('kycForm');
         const loginError = document.getElementById('loginError');
-        const kycSuccess = document.getElementById('kycSuccess');
+        const kycSuccess = document.getElementById('kycSuccess'); // This will now be hidden, modal replaces its function
         const kycError = document.getElementById('kycError');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const userIdDisplay = document.getElementById('userIdDisplay');
@@ -581,9 +632,14 @@
         const orgChartFile = document.getElementById('orgChartFile');
         const otherDocsFile = document.getElementById('otherDocsFile');
 
-        // New compliance undertaking checkbox
+        // Checkboxes
         const complianceUndertakingCheckbox = document.getElementById('complianceUndertaking');
         const dataAccuracyConsentCheckbox = document.getElementById('dataAccuracyConsent');
+
+        // Modal elements
+        const successModal = document.getElementById('successModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalOkBtn = document.getElementById('modalOkBtn');
 
 
         let currentUserId = null;
@@ -596,6 +652,34 @@
         // Function to hide loading overlay
         function hideLoading() {
             loadingOverlay.classList.remove('visible');
+        }
+
+        // Function to show custom modal
+        function showSuccessModal(message) {
+            modalMessage.textContent = message;
+            successModal.classList.add('visible');
+        }
+
+        // Function to hide custom modal and reset form/navigate
+        function hideSuccessModal() {
+            successModal.classList.remove('visible');
+            kycForm.reset(); // Clear the form
+            dataAccuracyConsentCheckbox.checked = false; // Manually reset checkbox
+            complianceUndertakingCheckbox.checked = false; // Manually reset new checkbox
+            document.getElementsByName('sanctionedDealing').forEach(radio => radio.checked = false); // Reset radio buttons
+            document.getElementsByName('isGroup').forEach(radio => radio.checked = false); // Reset group radio buttons
+            groupDetailsDiv.classList.add('hidden'); // Hide group details
+            groupNameInput.removeAttribute('required');
+            otherRelatedEntitiesTextarea.removeAttribute('required');
+
+            // Clear file inputs
+            regCertificateFile.value = '';
+            taxIdFile.value = '';
+            bankStatementFile.value = '';
+            orgChartFile.value = '';
+            otherDocsFile.value = '';
+
+            showSection(loginSection); // Go back to login screen
         }
 
         // Function to switch sections with animation
@@ -754,10 +838,57 @@
             }
         });
 
-        // KYC Form Submission (Client-side only, no data persistence implemented as per request)
-        kycForm.addEventListener('submit', (e) => {
+        // Event listener for modal OK button
+        modalOkBtn.addEventListener('click', hideSuccessModal);
+
+        /**
+         * Uploads a file to Firebase Storage and returns its download URL.
+         * @param {File} file The file to upload.
+         * @param {string} userId The current user's ID.
+         * @param {string} kycDocId The Firestore document ID for the KYC application.
+         * @returns {Promise<string|null>} A promise that resolves with the download URL or null if upload fails.
+         */
+        async function uploadFile(file, userId, kycDocId) {
+            if (!file) return null;
+
+            const storagePath = `kycigaptrading_attachments/${userId}/${kycDocId}/${file.name}`;
+            const storageRef = ref(storage, storagePath);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            return new Promise((resolve, reject) => {
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // Observe state change events such as progress, pause, and resume
+                        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log(`Upload of ${file.name} is ${progress}% done`);
+                        // You could update a progress bar here if you had one
+                    },
+                    (error) => {
+                        // Handle unsuccessful uploads
+                        console.error(`Error uploading ${file.name}:`, error);
+                        reject(null); // Reject with null to indicate failure
+                    },
+                    async () => {
+                        // Handle successful uploads on complete
+                        try {
+                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                            console.log(`File ${file.name} available at`, downloadURL);
+                            resolve(downloadURL);
+                        } catch (error) {
+                            console.error(`Error getting download URL for ${file.name}:`, error);
+                            reject(null);
+                        }
+                    }
+                );
+            });
+        }
+
+
+        // KYC Form Submission
+        kycForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            kycSuccess.classList.add('hidden');
+            showLoading();
             kycError.classList.add('hidden'); // Clear previous errors
 
             // Get selected radio button value for sanctioned dealing
@@ -779,15 +910,6 @@
                     break;
                 }
             }
-
-            // Collect file names (simulated upload)
-            const uploadedFiles = {
-                regCertificate: regCertificateFile.files.length > 0 ? regCertificateFile.files[0].name : '',
-                taxId: taxIdFile.files.length > 0 ? taxIdFile.files[0].name : '',
-                bankStatement: bankStatementFile.files.length > 0 ? bankStatementFile.files[0].name : '',
-                orgChart: orgChartFile.files.length > 0 ? orgChartFile.files[0].name : '',
-                otherDocs: Array.from(otherDocsFile.files).map(file => file.name)
-            };
 
             // Temporary object to hold form data for validation
             const tempFormData = {
@@ -830,7 +952,7 @@
                 swiftBic: document.getElementById('swiftBic').value,
                 dataAccuracyConsent: dataAccuracyConsentCheckbox.checked,
                 complianceUndertaking: complianceUndertakingCheckbox.checked,
-                uploadedFiles: uploadedFiles
+                uploadedFileUrls: {} // To store URLs of uploaded files
             };
 
             // Apply sanitization and validation to relevant text fields
@@ -858,6 +980,7 @@
 
             for (const fieldName in fieldsToSanitize) {
                 if (!sanitizeAndValidateInput(fieldsToSanitize[fieldName], fieldName)) {
+                    hideLoading();
                     return; // Stop submission if validation fails
                 }
             }
@@ -866,16 +989,19 @@
             if (tempFormData.companyName.trim() === '') {
                 kycError.textContent = "Company Name is required.";
                 kycError.classList.remove('hidden');
+                hideLoading();
                 return;
             }
             if (tempFormData.contactEmail.trim() === '') {
                 kycError.textContent = "Contact Email is required.";
                 kycError.classList.remove('hidden');
+                hideLoading();
                 return;
             }
             if (tempFormData.contactPhone.trim() === '') {
                 kycError.textContent = "Contact Phone Number is required.";
                 kycError.classList.remove('hidden');
+                hideLoading();
                 return;
             }
 
@@ -884,46 +1010,79 @@
                 if (tempFormData.groupName.trim() === '') {
                     kycError.textContent = "Please enter the Group Name.";
                     kycError.classList.remove('hidden');
+                    hideLoading();
                     return;
                 }
                 if (tempFormData.otherRelatedEntities.trim() === '') {
                     kycError.textContent = "Please enter Other Related Entities or 'None' if not applicable.";
                     kycError.classList.remove('hidden');
+                    hideLoading();
                     return;
                 }
             }
 
-            // Checkboxes are now optional, so no hard validation unless they are checked
-            // if (!tempFormData.dataAccuracyConsent) {
-            //     kycError.textContent = "You must confirm the accuracy of the data.";
-            //     kycError.classList.remove('hidden');
-            //     return;
-            // }
-            // if (!tempFormData.complianceUndertaking) {
-            //     kycError.textContent = "You must agree to the compliance undertaking.";
-            //     kycError.classList.remove('hidden');
-            //     return;
-            // }
+            try {
+                // First, create the Firestore document to get its ID
+                // This ID will be used for structuring paths in Firebase Storage
+                const docRef = await addDoc(collection(db, `kycigaptrading/${currentUserId}/kycApplications`), {
+                    // Temporarily save data without file URLs, will update later
+                    ...tempFormData,
+                    uploadedFileUrls: {} // Initialize as empty, will fill after uploads
+                });
+                const kycDocId = docRef.id;
+                console.log("Firestore document created with ID:", kycDocId);
 
-            // Simulate form submission success
-            console.log("KYC Form Data Submitted:", tempFormData);
-            kycSuccess.textContent = "KYC application submitted successfully! (Data not saved to database in this demo)";
-            kycSuccess.classList.remove('hidden');
-            kycForm.reset(); // Clear the form
-            dataAccuracyConsentCheckbox.checked = false; // Manually reset checkbox
-            complianceUndertakingCheckbox.checked = false; // Manually reset new checkbox
-            document.getElementsByName('sanctionedDealing').forEach(radio => radio.checked = false); // Reset radio buttons
-            document.getElementsByName('isGroup').forEach(radio => radio.checked = false); // Reset group radio buttons
-            groupDetailsDiv.classList.add('hidden'); // Hide group details
-            groupNameInput.removeAttribute('required');
-            otherRelatedEntitiesTextarea.removeAttribute('required');
+                const fileUploadPromises = [];
+                const uploadedFileUrls = {};
 
-            // Clear file inputs
-            regCertificateFile.value = '';
-            taxIdFile.value = '';
-            bankStatementFile.value = '';
-            orgChartFile.value = '';
-            otherDocsFile.value = '';
+                // Map of file inputs to their corresponding keys in uploadedFileUrls
+                const fileInputs = [
+                    { input: regCertificateFile, key: 'regCertificate' },
+                    { input: taxIdFile, key: 'taxId' },
+                    { input: bankStatementFile, key: 'bankStatement' },
+                    { input: orgChartFile, key: 'orgChart' }
+                ];
+
+                for (const { input, key } of fileInputs) {
+                    if (input.files.length > 0) {
+                        fileUploadPromises.push(
+                            uploadFile(input.files[0], currentUserId, kycDocId).then(url => {
+                                if (url) uploadedFileUrls[key] = url;
+                            })
+                        );
+                    }
+                }
+
+                // Handle multiple other documents
+                if (otherDocsFile.files.length > 0) {
+                    const otherDocUrls = [];
+                    for (const file of otherDocsFile.files) {
+                        fileUploadPromises.push(
+                            uploadFile(file, currentUserId, kycDocId).then(url => {
+                                if (url) otherDocUrls.push(url);
+                            })
+                        );
+                    }
+                    uploadedFileUrls['otherDocs'] = otherDocUrls;
+                }
+
+                // Wait for all file uploads to complete
+                await Promise.all(fileUploadPromises);
+
+                // Update the Firestore document with the actual uploaded file URLs
+                await setDoc(docRef, { uploadedFileUrls }, { merge: true });
+                console.log("Firestore document updated with file URLs.");
+
+                // Show the success modal
+                showSuccessModal("Thank you for submitting KYC details, we will review the details and contact you.");
+                
+            } catch (error) {
+                console.error("KYC submission error:", error);
+                kycError.textContent = `Submission failed: ${error.message || "An unexpected error occurred."}`;
+                kycError.classList.remove('hidden');
+            } finally {
+                hideLoading();
+            }
         });
 
         // Logout functionality
