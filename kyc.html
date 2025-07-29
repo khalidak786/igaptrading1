@@ -603,6 +603,8 @@
         const termsSection = document.getElementById('termsSection');
         const kycFormSection = document.getElementById('kycFormSection');
         const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email'); // Added for clearing
+        const passwordInput = document.getElementById('password'); // Added for clearing
         const acceptTermsBtn = document.getElementById('acceptTermsBtn');
         const kycForm = document.getElementById('kycForm');
         const loginError = document.getElementById('loginError');
@@ -666,7 +668,7 @@
         }
 
         // Function to hide custom modal and reset form/navigate
-        function hideSuccessModal() {
+        async function hideSuccessModal() {
             successModal.classList.remove('visible');
             kycForm.reset(); // Clear the form
             dataAccuracyConsentCheckbox.checked = false; // Manually reset checkbox
@@ -684,7 +686,18 @@
             orgChartFile.value = '';
             otherDocsFile.value = '';
 
-            showSection(loginSection); // Go back to login screen
+            // Log out the user after successful submission
+            try {
+                await signOut(auth);
+                console.log("User logged out after KYC submission.");
+            } catch (error) {
+                console.error("Error logging out after KYC submission:", error);
+            } finally {
+                // Ensure login fields are cleared regardless of logout success
+                emailInput.value = '';
+                passwordInput.value = '';
+                showSection(loginSection); // Go back to login screen
+            }
         }
 
         // Function to switch sections with animation
@@ -755,6 +768,8 @@
                 // User is signed out
                 currentUserId = null;
                 userIdDisplay.textContent = "Not logged in";
+                emailInput.value = ''; // Clear email on logout
+                passwordInput.value = ''; // Clear password on logout
                 console.log("User logged out or not authenticated.");
                 showSection(loginSection); // Show login if not authenticated
             }
@@ -770,19 +785,14 @@
                     console.log("Signed in with custom token.");
                 } else {
                     // If no initialAuthToken, let onAuthStateChanged handle showing login.
-                    // No automatic anonymous sign-in here.
                     console.log("No initial custom token, waiting for manual login.");
-                    // Ensure login section is shown if no token is present
-                    showSection(loginSection);
+                    showSection(loginSection); // Ensure login section is shown
                 }
             } catch (error) {
                 console.error("Firebase initial sign-in error:", error);
-                // The onAuthStateChanged will still run and show login.
                 showSection(loginSection); // Ensure login section is shown on error
             } finally {
-                // onAuthStateChanged will handle hiding loading and showing the correct section
-                // This finally block might hide loading too early if onAuthStateChanged hasn't fired yet
-                // Best to rely on onAuthStateChanged to hide loading after determining auth state.
+                // onAuthStateChanged will hide loading.
             }
         };
 
@@ -790,8 +800,8 @@
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
-            const email = loginForm.email.value;
-            const password = loginForm.password.value;
+            const email = emailInput.value;
+            const password = passwordInput.value;
             loginError.classList.add('hidden'); // Hide previous errors
 
             try {
@@ -901,39 +911,56 @@
         async function generateKycPdf(formData, uploadedFileUrls) {
             const doc = new jsPDF();
             let y = 10; // Initial Y position for text
+            const margin = 10;
+            const lineHeight = 7;
+            const sectionSpacing = 10;
+            const fieldSpacing = 5;
 
-            doc.setFontSize(18);
-            doc.text("KYC Application Summary", 10, y);
-            y += 10;
+            // Title
+            doc.setFontSize(22);
+            doc.text("KYC Application Summary", margin, y);
+            y += sectionSpacing * 2;
 
-            doc.setFontSize(12);
-            doc.text(`Submission Date: ${new Date().toLocaleDateString()}`, 10, y);
-            y += 10;
-            doc.text(`Company Name: ${formData.companyName || 'N/A'}`, 10, y);
-            y += 10;
-            doc.text(`Contact Email: ${formData.contactEmail || 'N/A'}`, 10, y);
-            y += 10;
-            doc.text(`Contact Phone: ${formData.contactPhone || 'N/A'}`, 10, y);
-            y += 10;
+            // Submission Info
+            doc.setFontSize(10);
+            doc.text(`Submission Date: ${new Date().toLocaleDateString()}`, margin, y);
+            y += lineHeight;
+            doc.text(`User ID: ${currentUserId || 'N/A'}`, margin, y);
+            y += sectionSpacing;
 
-            // Helper to add text and manage page breaks
-            const addTextWithPageBreak = (label, value) => {
-                const text = `${label}: ${value || 'N/A'}`;
-                const splitText = doc.splitTextToSize(text, 180); // Max width 180mm
-                if (y + (splitText.length * 7) > doc.internal.pageSize.height - 20) { // 20mm margin from bottom
+            // Helper to add a section title
+            const addSectionTitle = (title) => {
+                if (y + sectionSpacing + lineHeight * 2 > doc.internal.pageSize.height - margin) {
                     doc.addPage();
-                    y = 10;
+                    y = margin;
                 }
-                doc.text(splitText, 10, y);
-                y += (splitText.length * 7); // Line height
+                doc.setFontSize(16);
+                doc.text(title, margin, y);
+                y += lineHeight + 3; // Space after title
+                doc.setDrawColor(200); // Light gray line
+                doc.line(margin, y, doc.internal.pageSize.width - margin, y); // Draw a line
+                y += lineHeight; // Space after line
+                doc.setFontSize(10); // Reset font size for content
             };
 
-            y += 10; // Spacer
+            // Helper to add text and manage page breaks for field-value pairs
+            const addTextWithPageBreak = (label, value) => {
+                const text = `${label}: ${value || 'N/A'}`;
+                const splitText = doc.splitTextToSize(text, doc.internal.pageSize.width - margin * 2);
+                
+                // Check if content fits on current page, if not, add new page
+                if (y + (splitText.length * lineHeight) > doc.internal.pageSize.height - margin) {
+                    doc.addPage();
+                    y = margin; // Reset Y for new page
+                    // Optionally repeat section title on new page if it's a continuation
+                }
+                doc.text(splitText, margin, y);
+                y += (splitText.length * lineHeight) + fieldSpacing; // Line height + spacing between fields
+            };
 
-            doc.setFontSize(14);
-            doc.text("Company Details", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Company Details
+            addSectionTitle("Company Details");
+            addTextWithPageBreak("Company Name", formData.companyName);
             addTextWithPageBreak("Legal Entity Type", formData.legalEntityType);
             addTextWithPageBreak("Registration Number", formData.regNumber);
             addTextWithPageBreak("Date of Incorporation", formData.dateOfIncorporation);
@@ -946,24 +973,20 @@
             addTextWithPageBreak("Tonnage Traded (Last 3 Years)", formData.tonnageTraded);
             addTextWithPageBreak("Annual Turnover (USD)", formData.annualTurnover);
             addTextWithPageBreak("Countries of Operation", formData.countriesOfOperation);
+            y += sectionSpacing;
 
-            y += 10; // Spacer
-            doc.setFontSize(14);
-            doc.text("Compliance Details", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Compliance Details
+            addSectionTitle("Compliance Details");
             addTextWithPageBreak("Deals with Sanctioned Entity", formData.sanctionedDealing);
             addTextWithPageBreak("Part of a Group", formData.isGroup);
             if (formData.isGroup === 'Yes') {
                 addTextWithPageBreak("Group Name", formData.groupName);
                 addTextWithPageBreak("Other Related Entities", formData.otherRelatedEntities);
             }
+            y += sectionSpacing;
 
-            y += 10; // Spacer
-            doc.setFontSize(14);
-            doc.text("Key Position Holders", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Key Position Holders
+            addSectionTitle("Key Position Holders");
             addTextWithPageBreak("CEO Name", formData.ceoName);
             addTextWithPageBreak("CEO Email", formData.ceoEmail);
             addTextWithPageBreak("CEO Phone", formData.ceoPhone);
@@ -974,29 +997,27 @@
             addTextWithPageBreak("Other Key Position", formData.otherKeyPosition);
             addTextWithPageBreak("Other Key Email", formData.otherKeyEmail);
             addTextWithPageBreak("Other Key Phone", formData.otherKeyPhone);
+            addTextWithPageBreak("Contact Person Name", formData.contactPerson);
+            addTextWithPageBreak("Contact Person Position", formData.contactPersonPosition);
+            addTextWithPageBreak("Contact Email", formData.contactEmail);
+            addTextWithPageBreak("Contact Phone", formData.contactPhone);
+            y += sectionSpacing;
 
-            y += 10; // Spacer
-            doc.setFontSize(14);
-            doc.text("Bank Details", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Bank Details
+            addSectionTitle("Bank Details");
             addTextWithPageBreak("Bank Name", formData.bankName);
             addTextWithPageBreak("Bank Account Number", formData.bankAccountNumber);
             addTextWithPageBreak("SWIFT/BIC Code", formData.swiftBic);
+            y += sectionSpacing;
 
-            y += 10; // Spacer
-            doc.setFontSize(14);
-            doc.text("Declarations", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Declarations
+            addSectionTitle("Declarations");
             addTextWithPageBreak("Compliance Undertaking Agreed", formData.complianceUndertaking ? 'Yes' : 'No');
             addTextWithPageBreak("Data Accuracy Consent Agreed", formData.dataAccuracyConsent ? 'Yes' : 'No');
+            y += sectionSpacing;
 
-            y += 10; // Spacer
-            doc.setFontSize(14);
-            doc.text("Uploaded Attachments", 10, y);
-            y += 7;
-            doc.setFontSize(10);
+            // Uploaded Attachments
+            addSectionTitle("Uploaded Attachments");
             const attachmentKeys = Object.keys(uploadedFileUrls);
             if (attachmentKeys.length > 0) {
                 attachmentKeys.forEach(key => {
@@ -1012,6 +1033,7 @@
             } else {
                 addTextWithPageBreak("No additional attachments uploaded.", "");
             }
+            y += sectionSpacing;
 
             return doc.output('blob'); // Return as Blob
         }
@@ -1239,7 +1261,7 @@
             try {
                 await signOut(auth);
                 console.log("User logged out.");
-                // onAuthStateChanged will handle redirecting to login section
+                // onAuthStateChanged will handle redirecting to login section and clearing fields
             } catch (error) {
                 console.error("Logout error:", error);
                 // Optionally display an error message for logout
