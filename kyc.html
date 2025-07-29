@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Workflow</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 700px; /* Increased max-width for more fields */
+            text-align: center;
+            position: relative;
+            overflow: hidden; /* For smooth transitions */
+        }
+        .form-section {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        .form-section.active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative; /* Make active section take up space */
+        }
+        .form-section.hidden {
+            display: none;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .loading-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .legal-text-container {
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+            padding-right: 15px; /* For scrollbar */
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+        .legal-text-container h2, .legal-text-container h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .legal-text-container p, .legal-text-container ul, .legal-text-container ol {
+            margin-bottom: 1rem;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .legal-text-container ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .legal-text-container ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+        }
+        .legal-text-container li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Login Form Section -->
+        <div id="loginSection" class="form-section active">
+            <!-- IGAP Logo -->
+            <img src="https://placehold.co/150x50/ADD8E6/000000?text=IGAP+Logo" alt="IGAP Logo" class="mb-8 max-w-[150px] h-auto">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Login to KYC Portal</h2>
+            <p class="text-sm text-gray-600 mb-4">
+                Your User ID: <span id="userIdDisplay" class="font-semibold text-blue-600">Loading...</span>
+            </p>
+            <form id="loginForm" class="w-full max-w-sm">
+                <div class="mb-4">
+                    <input type="email" id="email" placeholder="Email" required autocomplete="username"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <div class="mb-6">
+                    <input type="password" id="password" placeholder="Password" required autocomplete="current-password"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-md">
+                    Login
+                </button>
+                <p id="loginError" class="text-red-500 text-sm mt-4 hidden"></p>
+            </form>
+        </div>
+
+        <!-- Terms & Conditions / Disclaimer Section -->
+        <div id="termsSection" class="form-section hidden">
+            <!-- IGAP Logo -->
+            <img src="https://placehold.co/150x50/ADD8E6/000000?text=IGAP+Logo" alt="IGAP Logo" class="mb-8 max-w-[150px] h-auto">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Terms & Conditions and Disclaimer</h2>
+            <div class="legal-text-container">
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Terms and Conditions of Information Submission</h3>
+                <p>This document outlines the terms and conditions ("Terms") governing the submission of information by you ("Client" or "You") to IGAP LLC Fz ("IGAP," "We," "Us," or "Our"), a company registered in Meydan Free Zone, Dubai, UAE. By proceeding with the submission of information through this online portal, You acknowledge and agree to be bound by these Terms.</p>
+                <ol class="list-decimal list-inside ml-4 text-gray-600">
+                    <li><strong>Purpose of Information Collection (KYC):</strong> The information requested and submitted by You through this portal is solely for the purpose of IGAP conducting its internal Know Your Customer (KYC), anti-money laundering (AML), and compliance checks. This process is undertaken to facilitate the potential onboarding of You as a client for commodity trading activities.</li>
+                    <li><strong>Confidentiality and Data Usage:</strong> IGAP undertakes to treat all information submitted by You with reasonable confidentiality. However, You acknowledge that IGAP may share this information with its internal compliance, legal, and risk departments, and with external regulatory bodies or third-party service providers, as required by law or necessary for the aforementioned AML and compliance checks.</li>
+                    <li><strong>Accuracy of Information:</strong> You warrant that all information provided by You is true, accurate, complete, and not misleading in any material respect. You agree to promptly update any information that becomes inaccurate or outdated.</li>
+                    <li><strong>Non-Binding Nature:</strong> The submission of information through this portal, and IGAP's review thereof, does not constitute an offer, acceptance, or commitment by either party to enter into any business relationship, contract, or agreement whatsoever. This process is purely for preliminary assessment and due diligence.</li>
+                    <li><strong>No Obligation to Onboard:</strong> IGAP reserves the absolute right, at its sole discretion, to accept or reject any potential client without providing any reason. The submission of information does not create any expectation or entitlement for You to be onboarded as a client.</li>
+                    <li><strong>Intellectual Property:</strong> All content, design, and functionality of this online portal are the exclusive property of IGAP LLC Fz.</li>
+                    <li><strong>Governing Law and Jurisdiction:</strong> These Terms shall be governed by and construed in accordance with the laws of the Dubai International Financial Centre (DIFC), without regard to its conflict of law principles. Any dispute arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the DIFC Courts.</li>
+                </ol>
+
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Disclaimer</h3>
+                <p>By proceeding, You acknowledge and agree to the following disclaimer:</p>
+                <ol class="list-decimal list-inside ml-4 text-gray-600">
+                    <li><strong>No Liability:</strong> IGAP LLC Fz, its owners, shareholders, directors, officers, employees, agents, and affiliates (collectively, "IGAP Parties") shall not be liable for any direct, indirect, incidental, consequential, special, punitive, or exemplary damages, including but not limited to, damages for loss of profits, goodwill, data, or other intangible losses, resulting from:
+                        <ul class="list-disc list-inside ml-4">
+                            <li>The use or inability to use this online portal or the information submitted.</li>
+                            <li>Any actions taken or not taken based on the information provided or the outcome of the compliance checks.</li>
+                            <li>Any errors or omissions in the information provided by You.</li>
+                            <li>Any unauthorized access to or alteration of Your transmissions or data.</li>
+                            <li>Any other matter relating to this information submission process.</li>
+                        </ul>
+                    </li>
+                    <li><strong>No Representations or Warranties:</strong> This online portal and the information submission process are provided on an "as is" and "as available" basis, without any representations or warranties of any kind, express or implied, including but not limited to, implied warranties of merchantability, fitness for a particular purpose, or non-infringement.</li>
+                    <li><strong>Independent Legal Advice:</strong> You are strongly advised to seek independent legal advice regarding these Terms and the implications of submitting Your information to IGAP.</li>
+                    <li><strong>Acceptance:</strong> Your act of clicking "I Accept" or proceeding with the information submission signifies Your full understanding and unconditional acceptance of these Terms and Disclaimer.</li>
+                </ol>
+            </div>
+            <button id="acceptTermsBtn"
+                    class="w-auto px-8 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 shadow-md mx-auto">
+                I Accept
+            </button>
+        </div>
+
+        <!-- KYC Form Section -->
+        <div id="kycFormSection" class="form-section hidden">
+            <!-- IGAP Logo -->
+            <img src="https://placehold.co/150x50/ADD8E6/000000?text=IGAP+Logo" alt="IGAP Logo" class="mb-8 max-w-[150px] h-auto">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">KYC Application Form</h2>
+            <form id="kycForm" class="w-full max-w-xl text-left">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="companyName" class="block text-gray-700 text-sm font-bold mb-2">Company Name:</label>
+                        <input type="text" id="companyName" placeholder="Enter company name" required autocomplete="organization"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="legalEntityType" class="block text-gray-700 text-sm font-bold mb-2">Legal Entity Type:</label>
+                        <select id="legalEntityType" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                            <option value="">Select Type</option>
+                            <option value="Corporation">Corporation</option>
+                            <option value="Partnership">Partnership</option>
+                            <option value="LLC">LLC (Limited Liability Company)</option>
+                            <option value="Sole Proprietorship">Sole Proprietorship</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="regNumber" class="block text-gray-700 text-sm font-bold mb-2">Registration Number:</label>
+                        <input type="text" id="regNumber" placeholder="Enter registration number" required autocomplete="off"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="dateOfIncorporation" class="block text-gray-700 text-sm font-bold mb-2">Date of Incorporation:</label>
+                        <input type="date" id="dateOfIncorporation" required autocomplete="off"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="placeOfIncorporation" class="block text-gray-700 text-sm font-bold mb-2">Place of Incorporation:</label>
+                        <input type="text" id="placeOfIncorporation" placeholder="e.g., Dubai, UAE" required autocomplete="address-level2"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="taxIdNumber" class="block text-gray-700 text-sm font-bold mb-2">Tax Identification Number (TIN):</label>
+                        <input type="text" id="taxIdNumber" placeholder="Enter TIN" autocomplete="taxid"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="companyAddress" class="block text-gray-700 text-sm font-bold mb-2">Company Address:</label>
+                    <textarea id="companyAddress" placeholder="Enter full company address" rows="3" required autocomplete="street-address"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="websiteUrl" class="block text-gray-700 text-sm font-bold mb-2">Company Website (Optional):</label>
+                    <input type="url" id="websiteUrl" placeholder="https://www.example.com" autocomplete="url"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+
+                <div class="mb-4">
+                    <label for="businessDescription" class="block text-gray-700 text-sm font-bold mb-2">Detailed Business Activities:</label>
+                    <textarea id="businessDescription" placeholder="Describe your primary business activities in detail" rows="4" required
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="annualTurnover" class="block text-gray-700 text-sm font-bold mb-2">Estimated Annual Turnover (USD):</label>
+                        <input type="number" id="annualTurnover" placeholder="e.g., 5000000" min="0" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="countriesOfOperation" class="block text-gray-700 text-sm font-bold mb-2">Primary Countries of Operation:</label>
+                        <input type="text" id="countriesOfOperation" placeholder="e.g., UAE, India, Singapore (comma-separated)" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Contact Person Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="contactPerson" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+                        <input type="text" id="contactPerson" placeholder="Enter contact person's full name" required autocomplete="name"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="contactPersonPosition" class="block text-gray-700 text-sm font-bold mb-2">Position/Title:</label>
+                        <input type="text" id="contactPersonPosition" placeholder="e.g., CEO, Head of Compliance" required autocomplete="organization-title"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="contactEmail" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                        <input type="email" id="contactEmail" placeholder="Enter contact email" required autocomplete="email"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="contactPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
+                        <input type="tel" id="contactPhone" placeholder="e.g., +971 50 123 4567" autocomplete="tel"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Bank Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="bankName" class="block text-gray-700 text-sm font-bold mb-2">Bank Name:</label>
+                        <input type="text" id="bankName" placeholder="Enter bank name" autocomplete="off"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                    <div>
+                        <label for="bankAccountNumber" class="block text-gray-700 text-sm font-bold mb-2">Bank Account Number:</label>
+                        <input type="text" id="bankAccountNumber" placeholder="Enter account number" autocomplete="off"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="swiftBic" class="block text-gray-700 text-sm font-bold mb-2">SWIFT/BIC Code:</label>
+                    <input type="text" id="swiftBic" placeholder="Enter SWIFT/BIC code" autocomplete="off"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
+
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="dataAccuracyConsent" required class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="dataAccuracyConsent" class="text-gray-700 text-sm">I confirm that all information provided is accurate and complete to the best of my knowledge.</label>
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 shadow-md mb-4">
+                    Submit KYC Application
+                </button>
+                <p id="kycSuccess" class="text-green-500 text-sm mt-4 hidden"></p>
+                <p id="kycError" class="text-red-500 text-sm mt-4 hidden"></p>
+                <button id="logoutBtn"
+                        class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 shadow-md">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase config and app ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Use the explicit firebaseConfig provided by the user
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_FHvA4TPW3T0msOXji2uz7_mfkvX0-UA",
+            authDomain: "tester-a9f07.firebaseapp.com",
+            projectId: "tester-a9f07",
+            storageBucket: "tester-a9f07.firebasestorage.app",
+            messagingSenderId: "840050053279",
+            appId: "1:840050053279:web:947b64c07f330af68452aa",
+            measurementId: "G-3C5E3N06TT"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const loginSection = document.getElementById('loginSection');
+        const termsSection = document.getElementById('termsSection');
+        const kycFormSection = document.getElementById('kycFormSection');
+        const loginForm = document.getElementById('loginForm');
+        const acceptTermsBtn = document.getElementById('acceptTermsBtn');
+        const kycForm = document.getElementById('kycForm');
+        const loginError = document.getElementById('loginError');
+        const kycSuccess = document.getElementById('kycSuccess');
+        const kycError = document.getElementById('kycError');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        let currentUserId = null;
+
+        // Function to show loading overlay
+        function showLoading() {
+            loadingOverlay.classList.add('visible');
+        }
+
+        // Function to hide loading overlay
+        function hideLoading() {
+            loadingOverlay.classList.remove('visible');
+        }
+
+        // Function to switch sections with animation
+        function showSection(sectionToShow) {
+            const sections = [loginSection, termsSection, kycFormSection];
+            sections.forEach(section => {
+                if (section === sectionToShow) {
+                    section.classList.remove('hidden');
+                    setTimeout(() => section.classList.add('active'), 10); // Small delay for transition
+                } else {
+                    section.classList.remove('active');
+                    section.classList.add('hidden');
+                }
+            });
+        }
+
+        // Authentication state observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                currentUserId = user.uid;
+                userIdDisplay.textContent = currentUserId;
+                console.log("User logged in:", user.uid);
+                // If user is already logged in, show terms directly
+                showSection(termsSection);
+            } else {
+                // User is signed out
+                currentUserId = null;
+                userIdDisplay.textContent = "Not logged in";
+                console.log("User logged out or not authenticated.");
+                showSection(loginSection); // Show login if not authenticated
+            }
+            hideLoading(); // Hide loading once auth state is determined
+        });
+
+        // Initial authentication attempt with custom token or anonymously
+        window.onload = async function() {
+            showLoading();
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Signed in with custom token.");
+                } else {
+                    // With explicit firebaseConfig, we should not sign in anonymously if email/password is intended
+                    // However, for Canvas environment, if no custom token, anonymous sign-in is the fallback.
+                    // If you intend *only* email/password, you might remove this signInAnonymously call.
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously.");
+                }
+            } catch (error) {
+                console.error("Firebase initial sign-in error:", error);
+                // If initial sign-in fails, the onAuthStateChanged will still run and show login.
+            } finally {
+                // onAuthStateChanged will handle hiding loading and showing the correct section
+            }
+        };
+
+        // Login Form Submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const email = loginForm.email.value;
+            const password = loginForm.password.value;
+            loginError.classList.add('hidden'); // Hide previous errors
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle showing the terms section
+            } catch (error) {
+                let errorMessage = "An unknown error occurred. Please try again.";
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = "Invalid email format.";
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = "This user account has been disabled.";
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = "Invalid email or password.";
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = "Too many login attempts. Please try again later.";
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                loginError.textContent = errorMessage;
+                loginError.classList.remove('hidden');
+                console.error("Login error:", error);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Accept Terms & Conditions
+        acceptTermsBtn.addEventListener('click', () => {
+            showSection(kycFormSection);
+        });
+
+        // KYC Form Submission (Client-side only, no data persistence implemented as per request)
+        kycForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            kycSuccess.classList.add('hidden');
+            kycError.classList.add('hidden');
+
+            // Collect form data
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                legalEntityType: document.getElementById('legalEntityType').value,
+                regNumber: document.getElementById('regNumber').value,
+                dateOfIncorporation: document.getElementById('dateOfIncorporation').value,
+                placeOfIncorporation: document.getElementById('placeOfIncorporation').value,
+                taxIdNumber: document.getElementById('taxIdNumber').value,
+                companyAddress: document.getElementById('companyAddress').value,
+                websiteUrl: document.getElementById('websiteUrl').value,
+                businessDescription: document.getElementById('businessDescription').value,
+                annualTurnover: document.getElementById('annualTurnover').value,
+                countriesOfOperation: document.getElementById('countriesOfOperation').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                contactPersonPosition: document.getElementById('contactPersonPosition').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                bankName: document.getElementById('bankName').value,
+                bankAccountNumber: document.getElementById('bankAccountNumber').value,
+                swiftBic: document.getElementById('swiftBic').value,
+                dataAccuracyConsent: document.getElementById('dataAccuracyConsent').checked
+            };
+
+            // Basic validation
+            // Check for required fields (excluding optional ones like websiteUrl, taxIdNumber, bank details if not required)
+            const requiredFields = [
+                'companyName', 'legalEntityType', 'regNumber', 'dateOfIncorporation',
+                'placeOfIncorporation', 'companyAddress', 'businessDescription',
+                'annualTurnover', 'countriesOfOperation', 'contactPerson',
+                'contactPersonPosition', 'contactEmail', 'dataAccuracyConsent'
+            ];
+
+            for (const field of requiredFields) {
+                if (!formData[field] || (typeof formData[field] === 'string' && formData[field].trim() === '')) {
+                    kycError.textContent = `Please fill in the required field: ${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}.`;
+                    kycError.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            if (!formData.dataAccuracyConsent) {
+                kycError.textContent = "You must confirm the accuracy of the data.";
+                kycError.classList.remove('hidden');
+                return;
+            }
+
+            // Simulate form submission success
+            console.log("KYC Form Data Submitted:", formData);
+            kycSuccess.textContent = "KYC application submitted successfully! (Data not saved to database in this demo)";
+            kycSuccess.classList.remove('hidden');
+            kycForm.reset(); // Clear the form
+            document.getElementById('dataAccuracyConsent').checked = false; // Manually reset checkbox
+        });
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', async () => {
+            showLoading();
+            try {
+                await signOut(auth);
+                console.log("User logged out.");
+                // onAuthStateChanged will handle redirecting to login section
+            } catch (error) {
+                console.error("Logout error:", error);
+                // Optionally display an error message for logout
+            } finally {
+                hideLoading();
+            }
+        });
+    </script>
+</body>
+</html>
