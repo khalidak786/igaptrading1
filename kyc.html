@@ -221,7 +221,7 @@
                     </div>
                     <div>
                         <label for="legalEntityType" class="block text-gray-700 text-sm font-bold mb-2">Legal Entity Type:</label>
-                        <select id="legalEntityType" required
+                        <select id="legalEntityType"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                             <option value="">Select Type</option>
                             <option value="Corporation">Corporation</option>
@@ -236,12 +236,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="regNumber" class="block text-gray-700 text-sm font-bold mb-2">Registration Number:</label>
-                        <input type="text" id="regNumber" placeholder="Enter registration number" required autocomplete="off"
+                        <input type="text" id="regNumber" placeholder="Enter registration number" autocomplete="off"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                     <div>
                         <label for="dateOfIncorporation" class="block text-gray-700 text-sm font-bold mb-2">Date of Incorporation:</label>
-                        <input type="date" id="dateOfIncorporation" required autocomplete="off"
+                        <input type="date" id="dateOfIncorporation" autocomplete="off"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                 </div>
@@ -249,7 +249,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="placeOfIncorporation" class="block text-gray-700 text-sm font-bold mb-2">Place of Incorporation:</label>
-                        <input type="text" id="placeOfIncorporation" placeholder="e.g., Dubai, UAE" required autocomplete="address-level2"
+                        <input type="text" id="placeOfIncorporation" placeholder="e.g., Dubai, UAE" autocomplete="address-level2"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                     <div>
@@ -261,7 +261,7 @@
 
                 <div class="mb-4">
                     <label for="companyAddress" class="block text-gray-700 text-sm font-bold mb-2">Company Address:</label>
-                    <textarea id="companyAddress" placeholder="Enter full company address" rows="3" required autocomplete="street-address"
+                    <textarea id="companyAddress" placeholder="Enter full company address" rows="3" autocomplete="street-address"
                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
                 </div>
 
@@ -273,7 +273,7 @@
 
                 <div class="mb-4">
                     <label for="businessDescription" class="block text-gray-700 text-sm font-bold mb-2">Detailed Business Activities:</label>
-                    <textarea id="businessDescription" placeholder="Describe your primary business activities in detail" rows="4" required
+                    <textarea id="businessDescription" placeholder="Describe your primary business activities in detail" rows="4"
                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"></textarea>
                 </div>
 
@@ -293,12 +293,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="annualTurnover" class="block text-gray-700 text-sm font-bold mb-2">Estimated Annual Turnover (USD):</label>
-                        <input type="number" id="annualTurnover" placeholder="e.g., 5000000" min="0" required
+                        <input type="number" id="annualTurnover" placeholder="e.g., 5000000" min="0"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                     <div>
                         <label for="countriesOfOperation" class="block text-gray-700 text-sm font-bold mb-2">Primary Countries of Operation:</label>
-                        <input type="text" id="countriesOfOperation" placeholder="e.g., UAE, India, Singapore (comma-separated)" required
+                        <input type="text" id="countriesOfOperation" placeholder="e.g., UAE, India, Singapore (comma-separated)"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                 </div>
@@ -309,11 +309,11 @@
                         Do you or your company deal with any sanctioned entity, country, individual, vessel, or any related party which is sanctioned by any international or national authority?
                     </label>
                     <div class="flex items-center space-x-4 mt-2">
-                        <input type="radio" id="sanctionedYes" name="sanctionedDealing" value="Yes" required
+                        <input type="radio" id="sanctionedYes" name="sanctionedDealing" value="Yes"
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <label for="sanctionedYes" class="text-gray-700">Yes</label>
 
-                        <input type="radio" id="sanctionedNo" name="sanctionedDealing" value="No" required
+                        <input type="radio" id="sanctionedNo" name="sanctionedDealing" value="No"
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <label for="sanctionedNo" class="text-gray-700">No</label>
                     </div>
@@ -324,11 +324,11 @@
                         Is your entity part of a group?
                     </label>
                     <div class="flex items-center space-x-4 mt-2">
-                        <input type="radio" id="groupYes" name="isGroup" value="Yes" required
+                        <input type="radio" id="groupYes" name="isGroup" value="Yes"
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <label for="groupYes" class="text-gray-700">Yes</label>
 
-                        <input type="radio" id="groupNo" name="isGroup" value="No" required
+                        <input type="radio" id="groupNo" name="isGroup" value="No"
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                         <label for="groupNo" class="text-gray-700">No</label>
                     </div>
@@ -347,16 +347,87 @@
                     </div>
                 </div>
 
+                <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Key Position Holders</h3>
+                <div class="mb-4 border p-4 rounded-lg bg-gray-50">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">CEO Details:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="ceoName" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+                            <input type="text" id="ceoName" placeholder="CEO's Full Name" autocomplete="name"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="ceoEmail" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                            <input type="email" id="ceoEmail" placeholder="CEO's Email" autocomplete="email"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="ceoPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number (Optional):</label>
+                        <input type="tel" id="ceoPhone" placeholder="CEO's Phone Number" autocomplete="tel"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="mb-4 border p-4 rounded-lg bg-gray-50">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">CFO Details:</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="cfoName" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+                            <input type="text" id="cfoName" placeholder="CFO's Full Name" autocomplete="name"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="cfoEmail" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                            <input type="email" id="cfoEmail" placeholder="CFO's Email" autocomplete="email"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="cfoPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number (Optional):</label>
+                        <input type="tel" id="cfoPhone" placeholder="CFO's Phone Number" autocomplete="tel"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                    </div>
+                </div>
+
+                <div class="mb-6 border p-4 rounded-lg bg-gray-50">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Other Key Position Holder (Optional):</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="otherKeyName" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+                            <input type="text" id="otherKeyName" placeholder="Name"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="otherKeyPosition" class="block text-gray-700 text-sm font-bold mb-2">Position/Title:</label>
+                            <input type="text" id="otherKeyPosition" placeholder="Position"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                        <div>
+                            <label for="otherKeyEmail" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+                            <input type="email" id="otherKeyEmail" placeholder="Email"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                        <div>
+                            <label for="otherKeyPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
+                            <input type="tel" id="otherKeyPhone" placeholder="Phone Number"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                        </div>
+                    </div>
+                </div>
+
                 <h3 class="text-xl font-semibold text-gray-700 mt-6 mb-4">Contact Person Details</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="contactPerson" class="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
-                        <input type="text" id="contactPerson" placeholder="Enter contact person's full name" required autocomplete="name"
+                        <input type="text" id="contactPerson" placeholder="Enter contact person's full name"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                     <div>
                         <label for="contactPersonPosition" class="block text-gray-700 text-sm font-bold mb-2">Position/Title:</label>
-                        <input type="text" id="contactPersonPosition" placeholder="e.g., CEO, Head of Compliance" required autocomplete="organization-title"
+                        <input type="text" id="contactPersonPosition" placeholder="e.g., CEO, Head of Compliance"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                 </div>
@@ -369,7 +440,7 @@
                     </div>
                     <div>
                         <label for="contactPhone" class="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
-                        <input type="tel" id="contactPhone" placeholder="e.g., +971 50 123 4567" autocomplete="tel"
+                        <input type="tel" id="contactPhone" placeholder="e.g., +971 50 123 4567" required autocomplete="tel"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                     </div>
                 </div>
@@ -409,14 +480,26 @@
                     <input type="file" id="bankStatementFile" accept=".pdf"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                 </div>
+                <div class="mb-4">
+                    <label for="orgChartFile" class="block text-gray-700 text-sm font-bold mb-2">Organization Chart (PDF):</label>
+                    <input type="file" id="orgChartFile" accept=".pdf"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                </div>
                 <div class="mb-6">
                     <label for="otherDocsFile" class="block text-gray-700 text-sm font-bold mb-2">Other Supporting Documents (PDF, multiple allowed):</label>
                     <input type="file" id="otherDocsFile" accept=".pdf" multiple
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
                 </div>
 
+                <div class="mb-6 flex items-start">
+                    <input type="checkbox" id="complianceUndertaking" class="mr-2 mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="complianceUndertaking" class="text-gray-700 text-sm text-left">
+                        I hereby undertake and confirm that our entity complies with all applicable laws, regulations, and governmental orders related to our business operations, including but not limited to, environmental, labor, financial, and trade regulations, in all jurisdictions where we operate.
+                    </label>
+                </div>
+
                 <div class="mb-6 flex items-center">
-                    <input type="checkbox" id="dataAccuracyConsent" required class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <input type="checkbox" id="dataAccuracyConsent" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                     <label for="dataAccuracyConsent" class="text-gray-700 text-sm">I confirm that all information provided is accurate and complete to the best of my knowledge.</label>
                 </div>
 
@@ -479,11 +562,28 @@
         const groupNameInput = document.getElementById('groupName');
         const otherRelatedEntitiesTextarea = document.getElementById('otherRelatedEntities');
 
+        // Key Position Holders
+        const ceoNameInput = document.getElementById('ceoName');
+        const ceoEmailInput = document.getElementById('ceoEmail');
+        const ceoPhoneInput = document.getElementById('ceoPhone');
+        const cfoNameInput = document.getElementById('cfoName');
+        const cfoEmailInput = document.getElementById('cfoEmail');
+        const cfoPhoneInput = document.getElementById('cfoPhone');
+        const otherKeyNameInput = document.getElementById('otherKeyName');
+        const otherKeyPositionInput = document.getElementById('otherKeyPosition');
+        const otherKeyEmailInput = document.getElementById('otherKeyEmail');
+        const otherKeyPhoneInput = document.getElementById('otherKeyPhone');
+
         // File inputs
         const regCertificateFile = document.getElementById('regCertificateFile');
         const taxIdFile = document.getElementById('taxIdFile');
         const bankStatementFile = document.getElementById('bankStatementFile');
+        const orgChartFile = document.getElementById('orgChartFile');
         const otherDocsFile = document.getElementById('otherDocsFile');
+
+        // New compliance undertaking checkbox
+        const complianceUndertakingCheckbox = document.getElementById('complianceUndertaking');
+        const dataAccuracyConsentCheckbox = document.getElementById('dataAccuracyConsent');
 
 
         let currentUserId = null;
@@ -511,6 +611,47 @@
                 }
             });
         }
+
+        // Function to sanitize and validate input for vulgar words and risky characters
+        // Returns true if valid, false otherwise. Sets kycError message.
+        function sanitizeAndValidateInput(inputString, fieldName) {
+            if (typeof inputString !== 'string' || inputString.trim() === '') {
+                return true; // Let other required field validation handle empty strings
+            }
+
+            // List of vulgar words (case-insensitive) - extend as needed
+            const vulgarWords = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'damn', 'bastard', 'whore', 'porn', 'sex'];
+            const lowerCaseInput = inputString.toLowerCase();
+
+            for (const word of vulgarWords) {
+                if (lowerCaseInput.includes(word)) {
+                    kycError.textContent = `Input for "${fieldName}" contains inappropriate language. Please review.`;
+                    kycError.classList.remove('hidden');
+                    return false;
+                }
+            }
+
+            // Regex to detect common risky HTML/script patterns for XSS
+            // This is a basic client-side check. Server-side sanitization is crucial.
+            const riskyHtmlPattern = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>|<iframe\b|<img\b[^>]*onerror\b|<a\b[^>]*javascript:|eval\(|document\.cookie|window\.location/i;
+            if (riskyHtmlPattern.test(inputString)) {
+                kycError.textContent = `Input for "${fieldName}" contains risky characters or patterns (e.g., HTML tags, script). Please remove them.`;
+                kycError.classList.remove('hidden');
+                return false;
+            }
+
+            // Basic check for common SQL injection patterns
+            // This is a basic client-side check. Server-side validation is crucial.
+            const sqlInjectionPattern = /(?:--|#|\/\*|\*\/|xp_cmdshell|exec|union all select|insert into|drop table|alter table|delete from|update set|select \* from|delete from)/i;
+            if (sqlInjectionPattern.test(lowerCaseInput)) {
+                kycError.textContent = `Input for "${fieldName}" contains potentially malicious patterns. Please review.`;
+                kycError.classList.remove('hidden');
+                return false;
+            }
+
+            return true; // Input is clean
+        }
+
 
         // Authentication state observer
         onAuthStateChanged(auth, async (user) => {
@@ -597,6 +738,7 @@
         groupYesRadio.addEventListener('change', () => {
             if (groupYesRadio.checked) {
                 groupDetailsDiv.classList.remove('hidden');
+                // Group name and related entities are still conditionally required if 'Yes' is selected
                 groupNameInput.setAttribute('required', 'true');
                 otherRelatedEntitiesTextarea.setAttribute('required', 'true');
             }
@@ -616,7 +758,7 @@
         kycForm.addEventListener('submit', (e) => {
             e.preventDefault();
             kycSuccess.classList.add('hidden');
-            kycError.classList.add('hidden');
+            kycError.classList.add('hidden'); // Clear previous errors
 
             // Get selected radio button value for sanctioned dealing
             const sanctionedDealingRadios = document.getElementsByName('sanctionedDealing');
@@ -643,12 +785,12 @@
                 regCertificate: regCertificateFile.files.length > 0 ? regCertificateFile.files[0].name : '',
                 taxId: taxIdFile.files.length > 0 ? taxIdFile.files[0].name : '',
                 bankStatement: bankStatementFile.files.length > 0 ? bankStatementFile.files[0].name : '',
-                otherDocs: Array.from(otherDocsFile.files).map(file => file.name) // Array of names
+                orgChart: orgChartFile.files.length > 0 ? orgChartFile.files[0].name : '',
+                otherDocs: Array.from(otherDocsFile.files).map(file => file.name)
             };
 
-
-            // Collect form data
-            const formData = {
+            // Temporary object to hold form data for validation
+            const tempFormData = {
                 companyName: document.getElementById('companyName').value,
                 legalEntityType: document.getElementById('legalEntityType').value,
                 regNumber: document.getElementById('regNumber').value,
@@ -666,6 +808,19 @@
                 isGroup: isGroupValue,
                 groupName: isGroupValue === 'Yes' ? groupNameInput.value : '',
                 otherRelatedEntities: isGroupValue === 'Yes' ? otherRelatedEntitiesTextarea.value : '',
+                
+                // Key Position Holders
+                ceoName: ceoNameInput.value,
+                ceoEmail: ceoEmailInput.value,
+                ceoPhone: ceoPhoneInput.value,
+                cfoName: cfoNameInput.value,
+                cfoEmail: cfoEmailInput.value,
+                cfoPhone: cfoPhoneInput.value,
+                otherKeyName: otherKeyNameInput.value,
+                otherKeyPosition: otherKeyPositionInput.value,
+                otherKeyEmail: otherKeyEmailInput.value,
+                otherKeyPhone: otherKeyPhoneInput.value,
+
                 contactPerson: document.getElementById('contactPerson').value,
                 contactPersonPosition: document.getElementById('contactPersonPosition').value,
                 contactEmail: document.getElementById('contactEmail').value,
@@ -673,53 +828,90 @@
                 bankName: document.getElementById('bankName').value,
                 bankAccountNumber: document.getElementById('bankAccountNumber').value,
                 swiftBic: document.getElementById('swiftBic').value,
-                dataAccuracyConsent: document.getElementById('dataAccuracyConsent').checked,
-                uploadedFiles: uploadedFiles // Include uploaded file names
+                dataAccuracyConsent: dataAccuracyConsentCheckbox.checked,
+                complianceUndertaking: complianceUndertakingCheckbox.checked,
+                uploadedFiles: uploadedFiles
             };
 
-            // Basic validation
-            const requiredFields = [
-                'companyName', 'legalEntityType', 'regNumber', 'dateOfIncorporation',
-                'placeOfIncorporation', 'companyAddress', 'businessDescription',
-                'annualTurnover', 'countriesOfOperation', 'sanctionedDealing',
-                'isGroup',
-                'contactPerson', 'contactPersonPosition', 'contactEmail', 'dataAccuracyConsent'
-            ];
+            // Apply sanitization and validation to relevant text fields
+            const fieldsToSanitize = {
+                'Company Name': tempFormData.companyName,
+                'Registration Number': tempFormData.regNumber,
+                'Place of Incorporation': tempFormData.placeOfIncorporation,
+                'Tax Identification Number': tempFormData.taxIdNumber,
+                'Company Address': tempFormData.companyAddress,
+                'Business Description': tempFormData.businessDescription,
+                'Types of Commodities Traded': tempFormData.commoditiesTraded,
+                'Countries of Operation': tempFormData.countriesOfOperation,
+                'Group Name': tempFormData.groupName,
+                'Other Related Entities': tempFormData.otherRelatedEntities,
+                'CEO Name': tempFormData.ceoName,
+                'CFO Name': tempFormData.cfoName,
+                'Other Key Name': tempFormData.otherKeyName,
+                'Other Key Position': tempFormData.otherKeyPosition,
+                'Bank Name': tempFormData.bankName,
+                'Bank Account Number': tempFormData.bankAccountNumber,
+                'SWIFT/BIC Code': tempFormData.swiftBic,
+                'Contact Person Name': tempFormData.contactPerson,
+                'Contact Person Position': tempFormData.contactPersonPosition
+            };
 
-            // Add conditional validation for group details
-            if (formData.isGroup === 'Yes') {
-                if (formData.groupName.trim() === '') {
+            for (const fieldName in fieldsToSanitize) {
+                if (!sanitizeAndValidateInput(fieldsToSanitize[fieldName], fieldName)) {
+                    return; // Stop submission if validation fails
+                }
+            }
+
+            // Specific validation for the three required fields
+            if (tempFormData.companyName.trim() === '') {
+                kycError.textContent = "Company Name is required.";
+                kycError.classList.remove('hidden');
+                return;
+            }
+            if (tempFormData.contactEmail.trim() === '') {
+                kycError.textContent = "Contact Email is required.";
+                kycError.classList.remove('hidden');
+                return;
+            }
+            if (tempFormData.contactPhone.trim() === '') {
+                kycError.textContent = "Contact Phone Number is required.";
+                kycError.classList.remove('hidden');
+                return;
+            }
+
+            // Add conditional validation for group details (still required if 'Yes' is selected)
+            if (tempFormData.isGroup === 'Yes') {
+                if (tempFormData.groupName.trim() === '') {
                     kycError.textContent = "Please enter the Group Name.";
                     kycError.classList.remove('hidden');
                     return;
                 }
-                if (formData.otherRelatedEntities.trim() === '') {
+                if (tempFormData.otherRelatedEntities.trim() === '') {
                     kycError.textContent = "Please enter Other Related Entities or 'None' if not applicable.";
                     kycError.classList.remove('hidden');
                     return;
                 }
             }
 
-            for (const field of requiredFields) {
-                if (!formData[field] || (typeof formData[field] === 'string' && formData[field].trim() === '')) {
-                    kycError.textContent = `Please fill in the required field: ${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}.`;
-                    kycError.classList.remove('hidden');
-                    return;
-                }
-            }
-
-            if (!formData.dataAccuracyConsent) {
-                kycError.textContent = "You must confirm the accuracy of the data.";
-                kycError.classList.remove('hidden');
-                return;
-            }
+            // Checkboxes are now optional, so no hard validation unless they are checked
+            // if (!tempFormData.dataAccuracyConsent) {
+            //     kycError.textContent = "You must confirm the accuracy of the data.";
+            //     kycError.classList.remove('hidden');
+            //     return;
+            // }
+            // if (!tempFormData.complianceUndertaking) {
+            //     kycError.textContent = "You must agree to the compliance undertaking.";
+            //     kycError.classList.remove('hidden');
+            //     return;
+            // }
 
             // Simulate form submission success
-            console.log("KYC Form Data Submitted:", formData);
+            console.log("KYC Form Data Submitted:", tempFormData);
             kycSuccess.textContent = "KYC application submitted successfully! (Data not saved to database in this demo)";
             kycSuccess.classList.remove('hidden');
             kycForm.reset(); // Clear the form
-            document.getElementById('dataAccuracyConsent').checked = false; // Manually reset checkbox
+            dataAccuracyConsentCheckbox.checked = false; // Manually reset checkbox
+            complianceUndertakingCheckbox.checked = false; // Manually reset new checkbox
             document.getElementsByName('sanctionedDealing').forEach(radio => radio.checked = false); // Reset radio buttons
             document.getElementsByName('isGroup').forEach(radio => radio.checked = false); // Reset group radio buttons
             groupDetailsDiv.classList.add('hidden'); // Hide group details
@@ -730,6 +922,7 @@
             regCertificateFile.value = '';
             taxIdFile.value = '';
             bankStatementFile.value = '';
+            orgChartFile.value = '';
             otherDocsFile.value = '';
         });
 
