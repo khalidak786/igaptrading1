@@ -625,7 +625,7 @@
         const ceoEmailInput = document.getElementById('ceoEmail');
         const ceoPhoneInput = document.getElementById('ceoPhone');
         const cfoNameInput = document.getElementById('cfoName');
-        const cfoEmailInput = document.getElementById('cfoEmail');
+        const cfoEmailInput = document = document.getElementById('cfoEmail');
         const cfoPhoneInput = document.getElementById('cfoPhone');
         const otherKeyNameInput = document.getElementById('otherKeyName');
         const otherKeyPositionInput = document.getElementById('otherKeyPosition');
@@ -811,20 +811,20 @@
                 let errorMessage = "An unknown error occurred. Please try again.";
                 switch (error.code) {
                     case 'auth/invalid-email':
-                        errorMessage = "Invalid email format.";
+                        errorMessage = "The email address is not valid.";
                         break;
                     case 'auth/user-disabled':
                         errorMessage = "This user account has been disabled.";
                         break;
                     case 'auth/user-not-found':
                     case 'auth/wrong-password':
-                        errorMessage = "Invalid email or password.";
+                        errorMessage = "Invalid email or password."; // Combine for security
                         break;
                     case 'auth/too-many-requests':
-                        errorMessage = "Too many login attempts. Please try again later.";
+                        errorMessage = "Too many failed login attempts. Please try again later.";
                         break;
                     default:
-                        errorMessage = error.message;
+                        errorMessage = error.message; // Fallback to Firebase's message
                 }
                 loginError.textContent = errorMessage;
                 loginError.classList.remove('hidden');
@@ -1272,6 +1272,7 @@
     </script>
 </body>
 </html>
+
 
 
 
