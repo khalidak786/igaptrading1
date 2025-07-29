@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF CDN for client-side PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -571,6 +573,9 @@
         import { getFirestore, collection, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
+        // Destructure jsPDF from the global window object (loaded via CDN)
+        const { jsPDF } = window.jspdf;
+
 
         // Global variables for Firebase config and app ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -848,16 +853,17 @@
         modalOkBtn.addEventListener('click', hideSuccessModal);
 
         /**
-         * Uploads a file to Firebase Storage and returns its download URL.
-         * @param {File} file The file to upload.
+         * Uploads a file (or Blob) to Firebase Storage and returns its download URL.
+         * @param {File|Blob} file The file or Blob to upload.
+         * @param {string} fileName The name to give the file in storage.
          * @param {string} userId The current user's ID.
          * @param {string} kycDocId The Firestore document ID for the KYC application.
          * @returns {Promise<string|null>} A promise that resolves with the download URL or null if upload fails.
          */
-        async function uploadFile(file, userId, kycDocId) {
+        async function uploadFile(file, fileName, userId, kycDocId) {
             if (!file) return null;
 
-            const storagePath = `kycigaptrading_attachments/${userId}/${kycDocId}/${file.name}`;
+            const storagePath = `kycigaptrading_attachments/${userId}/${kycDocId}/${fileName}`;
             const storageRef = ref(storage, storagePath);
             const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -865,29 +871,149 @@
                 uploadTask.on('state_changed',
                     (snapshot) => {
                         // Observe state change events such as progress, pause, and resume
-                        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log(`Upload of ${file.name} is ${progress}% done`);
-                        // You could update a progress bar here if you had one
+                        console.log(`Upload of ${fileName} is ${progress}% done`);
                     },
                     (error) => {
-                        // Handle unsuccessful uploads
-                        console.error(`Error uploading ${file.name}:`, error);
-                        reject(null); // Reject with null to indicate failure
+                        console.error(`Error uploading ${fileName}:`, error);
+                        reject(null);
                     },
                     async () => {
-                        // Handle successful uploads on complete
                         try {
                             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            console.log(`File ${file.name} available at`, downloadURL);
+                            console.log(`File ${fileName} available at`, downloadURL);
                             resolve(downloadURL);
                         } catch (error) {
-                            console.error(`Error getting download URL for ${file.name}:`, error);
+                            console.error(`Error getting download URL for ${fileName}:`, error);
                             reject(null);
                         }
                     }
                 );
             });
+        }
+
+        /**
+         * Generates a PDF from the KYC form data using jsPDF.
+         * @param {Object} formData The collected form data.
+         * @param {Object} uploadedFileUrls URLs of already uploaded files (to include in PDF).
+         * @returns {Promise<Blob>} A promise that resolves with the generated PDF Blob.
+         */
+        async function generateKycPdf(formData, uploadedFileUrls) {
+            const doc = new jsPDF();
+            let y = 10; // Initial Y position for text
+
+            doc.setFontSize(18);
+            doc.text("KYC Application Summary", 10, y);
+            y += 10;
+
+            doc.setFontSize(12);
+            doc.text(`Submission Date: ${new Date().toLocaleDateString()}`, 10, y);
+            y += 10;
+            doc.text(`Company Name: ${formData.companyName || 'N/A'}`, 10, y);
+            y += 10;
+            doc.text(`Contact Email: ${formData.contactEmail || 'N/A'}`, 10, y);
+            y += 10;
+            doc.text(`Contact Phone: ${formData.contactPhone || 'N/A'}`, 10, y);
+            y += 10;
+
+            // Helper to add text and manage page breaks
+            const addTextWithPageBreak = (label, value) => {
+                const text = `${label}: ${value || 'N/A'}`;
+                const splitText = doc.splitTextToSize(text, 180); // Max width 180mm
+                if (y + (splitText.length * 7) > doc.internal.pageSize.height - 20) { // 20mm margin from bottom
+                    doc.addPage();
+                    y = 10;
+                }
+                doc.text(splitText, 10, y);
+                y += (splitText.length * 7); // Line height
+            };
+
+            y += 10; // Spacer
+
+            doc.setFontSize(14);
+            doc.text("Company Details", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            addTextWithPageBreak("Legal Entity Type", formData.legalEntityType);
+            addTextWithPageBreak("Registration Number", formData.regNumber);
+            addTextWithPageBreak("Date of Incorporation", formData.dateOfIncorporation);
+            addTextWithPageBreak("Place of Incorporation", formData.placeOfIncorporation);
+            addTextWithPageBreak("Tax ID Number", formData.taxIdNumber);
+            addTextWithPageBreak("Company Address", formData.companyAddress);
+            addTextWithPageBreak("Website URL", formData.websiteUrl);
+            addTextWithPageBreak("Business Description", formData.businessDescription);
+            addTextWithPageBreak("Commodities Traded", formData.commoditiesTraded);
+            addTextWithPageBreak("Tonnage Traded (Last 3 Years)", formData.tonnageTraded);
+            addTextWithPageBreak("Annual Turnover (USD)", formData.annualTurnover);
+            addTextWithPageBreak("Countries of Operation", formData.countriesOfOperation);
+
+            y += 10; // Spacer
+            doc.setFontSize(14);
+            doc.text("Compliance Details", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            addTextWithPageBreak("Deals with Sanctioned Entity", formData.sanctionedDealing);
+            addTextWithPageBreak("Part of a Group", formData.isGroup);
+            if (formData.isGroup === 'Yes') {
+                addTextWithPageBreak("Group Name", formData.groupName);
+                addTextWithPageBreak("Other Related Entities", formData.otherRelatedEntities);
+            }
+
+            y += 10; // Spacer
+            doc.setFontSize(14);
+            doc.text("Key Position Holders", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            addTextWithPageBreak("CEO Name", formData.ceoName);
+            addTextWithPageBreak("CEO Email", formData.ceoEmail);
+            addTextWithPageBreak("CEO Phone", formData.ceoPhone);
+            addTextWithPageBreak("CFO Name", formData.cfoName);
+            addTextWithPageBreak("CFO Email", formData.cfoEmail);
+            addTextWithPageBreak("CFO Phone", formData.cfoPhone);
+            addTextWithPageBreak("Other Key Name", formData.otherKeyName);
+            addTextWithPageBreak("Other Key Position", formData.otherKeyPosition);
+            addTextWithPageBreak("Other Key Email", formData.otherKeyEmail);
+            addTextWithPageBreak("Other Key Phone", formData.otherKeyPhone);
+
+            y += 10; // Spacer
+            doc.setFontSize(14);
+            doc.text("Bank Details", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            addTextWithPageBreak("Bank Name", formData.bankName);
+            addTextWithPageBreak("Bank Account Number", formData.bankAccountNumber);
+            addTextWithPageBreak("SWIFT/BIC Code", formData.swiftBic);
+
+            y += 10; // Spacer
+            doc.setFontSize(14);
+            doc.text("Declarations", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            addTextWithPageBreak("Compliance Undertaking Agreed", formData.complianceUndertaking ? 'Yes' : 'No');
+            addTextWithPageBreak("Data Accuracy Consent Agreed", formData.dataAccuracyConsent ? 'Yes' : 'No');
+
+            y += 10; // Spacer
+            doc.setFontSize(14);
+            doc.text("Uploaded Attachments", 10, y);
+            y += 7;
+            doc.setFontSize(10);
+            const attachmentKeys = Object.keys(uploadedFileUrls);
+            if (attachmentKeys.length > 0) {
+                attachmentKeys.forEach(key => {
+                    const url = uploadedFileUrls[key];
+                    if (Array.isArray(url)) { // For 'otherDocs' which can be multiple URLs
+                        url.forEach((individualUrl, index) => {
+                            addTextWithPageBreak(`- ${key} (${index + 1})`, individualUrl);
+                        });
+                    } else {
+                        addTextWithPageBreak(`- ${key}`, url);
+                    }
+                });
+            } else {
+                addTextWithPageBreak("No additional attachments uploaded.", "");
+            }
+
+            return doc.output('blob'); // Return as Blob
         }
 
 
@@ -896,6 +1022,13 @@
             e.preventDefault();
             showLoading();
             kycError.classList.add('hidden'); // Clear previous errors
+
+            if (!currentUserId) {
+                kycError.textContent = "User not authenticated. Please log in.";
+                kycError.classList.remove('hidden');
+                hideLoading();
+                return;
+            }
 
             // Get selected radio button value for sanctioned dealing
             const sanctionedDealingRadios = document.getElementsByName('sanctionedDealing');
@@ -917,7 +1050,7 @@
                 }
             }
 
-            // Temporary object to hold form data for validation
+            // Collect all form data (text fields)
             const tempFormData = {
                 companyName: document.getElementById('companyName').value,
                 legalEntityType: document.getElementById('legalEntityType').value,
@@ -958,7 +1091,7 @@
                 swiftBic: document.getElementById('swiftBic').value,
                 dataAccuracyConsent: dataAccuracyConsentCheckbox.checked,
                 complianceUndertaking: complianceUndertakingCheckbox.checked,
-                uploadedFileUrls: {} // To store URLs of uploaded files
+                // uploadedFileUrls will be populated after uploads
             };
 
             // Apply sanitization and validation to relevant text fields
@@ -1033,14 +1166,16 @@
                 const docRef = await addDoc(collection(db, `kycigaptrading/${currentUserId}/kycApplications`), {
                     // Temporarily save data without file URLs, will update later
                     ...tempFormData,
+                    submissionTimestamp: new Date().toISOString(), // Add submission timestamp
                     uploadedFileUrls: {} // Initialize as empty, will fill after uploads
                 });
                 const kycDocId = docRef.id;
                 console.log("Firestore document created with ID:", kycDocId);
 
                 const fileUploadPromises = [];
-                const uploadedFileUrls = {};
+                const uploadedFileUrls = {}; // This will hold all URLs, including the generated PDF
 
+                // 1. Upload user-provided attachments
                 // Map of file inputs to their corresponding keys in uploadedFileUrls
                 const fileInputs = [
                     { input: regCertificateFile, key: 'regCertificate' },
@@ -1052,7 +1187,7 @@
                 for (const { input, key } of fileInputs) {
                     if (input.files.length > 0) {
                         fileUploadPromises.push(
-                            uploadFile(input.files[0], currentUserId, kycDocId).then(url => {
+                            uploadFile(input.files[0], input.files[0].name, currentUserId, kycDocId).then(url => {
                                 if (url) uploadedFileUrls[key] = url;
                             })
                         );
@@ -1064,7 +1199,7 @@
                     const otherDocUrls = [];
                     for (const file of otherDocsFile.files) {
                         fileUploadPromises.push(
-                            uploadFile(file, currentUserId, kycDocId).then(url => {
+                            uploadFile(file, file.name, currentUserId, kycDocId).then(url => {
                                 if (url) otherDocUrls.push(url);
                             })
                         );
@@ -1072,12 +1207,19 @@
                     uploadedFileUrls['otherDocs'] = otherDocUrls;
                 }
 
-                // Wait for all file uploads to complete
+                // Wait for all user-provided file uploads to complete first
                 await Promise.all(fileUploadPromises);
 
-                // Update the Firestore document with the actual uploaded file URLs
+                // 2. Generate and upload the KYC Form Summary PDF
+                const kycFormPdfBlob = await generateKycPdf(tempFormData, uploadedFileUrls);
+                const kycFormPdfUrl = await uploadFile(kycFormPdfBlob, 'kyc_form_summary.pdf', currentUserId, kycDocId);
+                if (kycFormPdfUrl) {
+                    uploadedFileUrls['kycFormPdf'] = kycFormPdfUrl;
+                }
+
+                // 3. Update the Firestore document with ALL collected file URLs (including the generated PDF)
                 await setDoc(doc(db, `kycigaptrading/${currentUserId}/kycApplications`, kycDocId), { uploadedFileUrls }, { merge: true });
-                console.log("Firestore document updated with file URLs.");
+                console.log("Firestore document updated with all file URLs, including generated PDF.");
 
                 // Show the success modal
                 showSuccessModal("Thank you for submitting KYC details, we will review the details and contact you.");
@@ -1108,6 +1250,7 @@
     </script>
 </body>
 </html>
+
 
 
 
