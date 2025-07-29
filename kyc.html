@@ -567,8 +567,8 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
 
@@ -756,7 +756,7 @@
             hideLoading(); // Hide loading once auth state is determined
         });
 
-        // Initial authentication attempt with custom token or anonymously
+        // Initial authentication attempt (only custom token, no anonymous fallback)
         window.onload = async function() {
             showLoading();
             try {
@@ -764,14 +764,20 @@
                     await signInWithCustomToken(auth, initialAuthToken);
                     console.log("Signed in with custom token.");
                 } else {
-                    await signInAnonymously(auth);
-                    console.log("Signed in anonymously.");
+                    // If no initialAuthToken, let onAuthStateChanged handle showing login.
+                    // No automatic anonymous sign-in here.
+                    console.log("No initial custom token, waiting for manual login.");
+                    // Ensure login section is shown if no token is present
+                    showSection(loginSection);
                 }
             } catch (error) {
                 console.error("Firebase initial sign-in error:", error);
-                // If initial sign-in fails, the onAuthStateChanged will still run and show login.
+                // The onAuthStateChanged will still run and show login.
+                showSection(loginSection); // Ensure login section is shown on error
             } finally {
                 // onAuthStateChanged will handle hiding loading and showing the correct section
+                // This finally block might hide loading too early if onAuthStateChanged hasn't fired yet
+                // Best to rely on onAuthStateChanged to hide loading after determining auth state.
             }
         };
 
@@ -1070,7 +1076,7 @@
                 await Promise.all(fileUploadPromises);
 
                 // Update the Firestore document with the actual uploaded file URLs
-                await setDoc(docRef, { uploadedFileUrls }, { merge: true });
+                await setDoc(doc(db, `kycigaptrading/${currentUserId}/kycApplications`, kycDocId), { uploadedFileUrls }, { merge: true });
                 console.log("Firestore document updated with file URLs.");
 
                 // Show the success modal
